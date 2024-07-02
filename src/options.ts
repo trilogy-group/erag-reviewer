@@ -29,7 +29,7 @@ export class Options {
     pathFilters: string[] | null = null,
     systemMessage = '',
     model = 'gpt-4o',
-    eragRetries = '5',
+    eragRetries = '3',
     eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
     eragBaseUrl = 'https://erag.trilogy.com/api/v2/',

@@ -153,7 +153,7 @@ inputs:
     required: false
     description:
       'How many times to retry Erag API in case of timeouts or errors?'
-    default: '5'
+    default: '3'
   erag_concurrency_limit:
     required: false
     description: 'How many concurrent API calls to make to Erag servers?'

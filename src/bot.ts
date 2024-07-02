@@ -1,21 +1,8 @@
 import './fetch-polyfill'
 
 import {info, setFailed, warning} from '@actions/core'
-import {
-  ChatGPTAPI,
-  ChatGPTError,
-  ChatMessage,
-  SendMessageOptions
-  // eslint-disable-next-line import/no-unresolved
-} from 'chatgpt'
 import pRetry from 'p-retry'
 import {OpenAIOptions, Options} from './options'
-
-// define type to save parentMessageId and conversationId
-export interface Ids {
-  parentMessageId?: string
-  conversationId?: string
-}
 
 export class Bot {
   private readonly api: ChatGPTAPI | null = null // not free

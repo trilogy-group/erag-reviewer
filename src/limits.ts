@@ -15,6 +15,10 @@ export class TokenLimits {
     } else if (model === 'gpt-4') {
       this.maxTokens = 8000
       this.responseTokens = 2000
+    } else if (model === 'gpt-4o') {
+      // gpt-4o has 128k token size but we set to 32k for now
+      this.maxTokens = 32600
+      this.responseTokens = 4000
     } else {
       this.maxTokens = 4000
       this.responseTokens = 1000

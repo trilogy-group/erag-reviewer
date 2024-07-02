@@ -34,12 +34,12 @@ export class Options {
     systemMessage = '',
     eragLightModel = 'gpt-4o',
     eragHeavyModel = 'gpt-4o',
-    eragModelTemperature = '0.0',
-    eragRetries = '3',
-    eragTimeoutMS = '120000',
+    eragModelTemperature = '0.05',
+    eragRetries = '5',
+    eragTimeoutMS = '360000',
     eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
-    eragBaseUrl = 'https://api.openai.com/v1',
+    eragBaseUrl = 'https://erag.trilogy.com/api/v2/',
     language = 'en-US'
   ) {
     this.debug = debug
@@ -135,19 +135,5 @@ export class PathFilter {
     }
 
     return (!inclusionRuleExists || included) && !excluded
-  }
-}
-
-export class OpenAIOptions {
-  model: string
-  tokenLimits: TokenLimits
-
-  constructor(model = 'gpt-3.5-turbo', tokenLimits: TokenLimits | null = null) {
-    this.model = model
-    if (tokenLimits != null) {
-      this.tokenLimits = tokenLimits
-    } else {
-      this.tokenLimits = new TokenLimits(model)
-    }
   }
 }

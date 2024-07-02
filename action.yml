@@ -143,7 +143,7 @@ inputs:
   erag_base_url:
     required: false
     description: 'The url of the erag api interface.'
-    default: 'https://api.openai.com/v1'
+    default: 'https://erag.trilogy.com/api/v2/'
   erag_light_model:
     required: false
     description:

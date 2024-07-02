@@ -2,14 +2,15 @@ import './fetch-polyfill'
 
 import {info, setFailed, warning} from '@actions/core'
 import pRetry from 'p-retry'
-import {OpenAIOptions, Options} from './options'
+import {Options} from './options'
+import {EragAPI} from './erag'
 
 export class Bot {
-  private readonly api: ChatGPTAPI | null = null // not free
+  private readonly api: EragAPI | null = null
 
   private readonly options: Options
 
-  constructor(options: Options, openaiOptions: OpenAIOptions) {
+  constructor(options: Options) {
     this.options = options
     if (process.env.OPENAI_API_KEY) {
       const currentDate = new Date().toISOString().split('T')[0]

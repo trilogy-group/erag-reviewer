@@ -6,7 +6,7 @@ import {
   warning
 } from '@actions/core'
 import {Bot} from './bot'
-import {OpenAIOptions, Options} from './options'
+import {Options} from './options'
 import {Prompts} from './prompts'
 import {codeReview} from './review'
 import {handleReviewComment} from './review-comment'
@@ -44,10 +44,7 @@ async function run(): Promise<void> {
 
   let lightBot: Bot | null = null
   try {
-    lightBot = new Bot(
-      options,
-      new OpenAIOptions(options.eragLightModel, options.lightTokenLimits)
-    )
+    lightBot = new Bot(options)
   } catch (e: any) {
     warning(
       `Skipped: failed to create summary bot, please check your openai_api_key: ${e}, backtrace: ${e.stack}`
@@ -57,10 +54,7 @@ async function run(): Promise<void> {
 
   let heavyBot: Bot | null = null
   try {
-    heavyBot = new Bot(
-      options,
-      new OpenAIOptions(options.eragHeavyModel, options.heavyTokenLimits)
-    )
+    heavyBot = new Bot(options)
   } catch (e: any) {
     warning(
       `Skipped: failed to create review bot, please check your openai_api_key: ${e}, backtrace: ${e.stack}`

@@ -20,7 +20,7 @@ const repo = context.repo
 const ASK_BOT = '@erag'
 
 export const handleReviewComment = async (
-  heavyBot: Bot,
+  reviewBot: Bot,
   options: Options,
   prompts: Prompts
 ) => {
@@ -169,7 +169,7 @@ export const handleReviewComment = async (
         }
       }
 
-      const reply = await heavyBot.chat(prompts.renderComment(inputs))
+      const reply = await reviewBot.chat(prompts.renderComment(inputs))
 
       await commenter.reviewCommentReply(pullNumber, topLevelComment, reply)
     }

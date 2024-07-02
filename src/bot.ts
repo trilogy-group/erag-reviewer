@@ -15,7 +15,7 @@ export class Bot {
     if (process.env.OPENAI_API_KEY) {
       const currentDate = new Date().toISOString().split('T')[0]
       const systemMessage = `${options.systemMessage} 
-Knowledge cutoff: ${openaiOptions.tokenLimits.knowledgeCutOff}
+Knowledge cutoff: ${options.tokenLimits.knowledgeCutOff}
 Current date: ${currentDate}
 
 IMPORTANT: Entire response must be in the language with ISO code: ${options.language}

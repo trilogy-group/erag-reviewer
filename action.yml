@@ -144,28 +144,16 @@ inputs:
     required: false
     description: 'The url of the erag api interface.'
     default: 'https://erag.trilogy.com/api/v2/'
-  erag_light_model:
+  model:
     required: false
     description:
-      'Model to use for simple tasks like summarizing diff on a file.'
+      'Model to use for review.'
     default: 'gpt-4o'
-  erag_heavy_model:
-    required: false
-    description: 'Model to use for complex tasks such as code reviews.'
-    default: 'gpt-4o'
-  erag_model_temperature:
-    required: false
-    description: 'Temperature for Erag model'
-    default: '0.05'
   erag_retries:
     required: false
     description:
       'How many times to retry Erag API in case of timeouts or errors?'
     default: '5'
-  erag_timeout_ms:
-    required: false
-    description: 'Timeout for Erag API call in millis'
-    default: '360000'
   erag_concurrency_limit:
     required: false
     description: 'How many concurrent API calls to make to Erag servers?'

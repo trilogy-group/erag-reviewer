@@ -11,15 +11,11 @@ export class Options {
   reviewCommentLGTM: boolean
   pathFilters: PathFilter
   systemMessage: string
-  eragLightModel: string
-  eragHeavyModel: string
-  eragModelTemperature: number
+  model: string
   eragRetries: number
-  eragTimeoutMS: number
   eragConcurrencyLimit: number
   githubConcurrencyLimit: number
-  lightTokenLimits: TokenLimits
-  heavyTokenLimits: TokenLimits
+  tokenLimits: TokenLimits
   eragBaseUrl: string
   language: string
 
@@ -32,11 +28,8 @@ export class Options {
     reviewCommentLGTM = false,
     pathFilters: string[] | null = null,
     systemMessage = '',
-    eragLightModel = 'gpt-4o',
-    eragHeavyModel = 'gpt-4o',
-    eragModelTemperature = '0.05',
+    model = 'gpt-4o',
     eragRetries = '5',
-    eragTimeoutMS = '360000',
     eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
     eragBaseUrl = 'https://erag.trilogy.com/api/v2/',
@@ -50,15 +43,11 @@ export class Options {
     this.reviewCommentLGTM = reviewCommentLGTM
     this.pathFilters = new PathFilter(pathFilters)
     this.systemMessage = systemMessage
-    this.eragLightModel = eragLightModel
-    this.eragHeavyModel = eragHeavyModel
-    this.eragModelTemperature = parseFloat(eragModelTemperature)
+    this.model = model
     this.eragRetries = parseInt(eragRetries)
-    this.eragTimeoutMS = parseInt(eragTimeoutMS)
     this.eragConcurrencyLimit = parseInt(eragConcurrencyLimit)
     this.githubConcurrencyLimit = parseInt(githubConcurrencyLimit)
-    this.lightTokenLimits = new TokenLimits(eragLightModel)
-    this.heavyTokenLimits = new TokenLimits(eragHeavyModel)
+    this.tokenLimits = new TokenLimits(model)
     this.eragBaseUrl = eragBaseUrl
     this.language = language
   }
@@ -73,15 +62,11 @@ export class Options {
     info(`review_comment_lgtm: ${this.reviewCommentLGTM}`)
     info(`path_filters: ${this.pathFilters}`)
     info(`system_message: ${this.systemMessage}`)
-    info(`erag_light_model: ${this.eragLightModel}`)
-    info(`erag_heavy_model: ${this.eragHeavyModel}`)
-    info(`erag_model_temperature: ${this.eragModelTemperature}`)
+    info(`model: ${this.model}`)
     info(`erag_retries: ${this.eragRetries}`)
-    info(`erag_timeout_ms: ${this.eragTimeoutMS}`)
     info(`erag_concurrency_limit: ${this.eragConcurrencyLimit}`)
     info(`github_concurrency_limit: ${this.githubConcurrencyLimit}`)
-    info(`summary_token_limits: ${this.lightTokenLimits.string()}`)
-    info(`review_token_limits: ${this.heavyTokenLimits.string()}`)
+    info(`token_limits: ${this.tokenLimits.string()}`)
     info(`erag_base_url: ${this.eragBaseUrl}`)
     info(`language: ${this.language}`)
   }

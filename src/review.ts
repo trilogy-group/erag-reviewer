@@ -25,8 +25,7 @@ const repo = context.repo
 const ignoreKeyword = '@erag: ignore'
 
 export const codeReview = async (
-  lightBot: Bot,
-  heavyBot: Bot,
+  reviewBot: Bot,
   options: Options,
   prompts: Prompts
 ): Promise<void> => {
@@ -329,7 +328,7 @@ ${
     )
     const tokens = getTokenCount(summarizePrompt)
 
-    if (tokens > options.lightTokenLimits.requestTokens) {
+    if (tokens > options.tokenLimits.requestTokens) {
       info(`summarize: diff tokens exceeds limit, skip ${filename}`)
       summariesFailed.push(`${filename} (diff tokens exceeds limit)`)
       return null
@@ -337,11 +336,11 @@ ${
 
     // summarize content
     try {
-      const summarizeResp = await lightBot.chat(summarizePrompt)
+      const summarizeResp = await reviewBot.chat(summarizePrompt)
 
       if (summarizeResp === '') {
-        info('summarize: nothing obtained from openai')
-        summariesFailed.push(`${filename} (nothing obtained from openai)`)
+        info('summarize: nothing obtained from erag')
+        summariesFailed.push(`${filename} (nothing obtained from erag)`)
         return null
       } else {
         if (options.reviewSimpleChanges === false) {
@@ -364,8 +363,8 @@ ${
         return [filename, summarizeResp, true]
       }
     } catch (e: any) {
-      warning(`summarize: error from openai: ${e as string}`)
-      summariesFailed.push(`${filename} (error from openai: ${e as string})})`)
+      warning(`summarize: error from erag: ${e as string}`)
+      summariesFailed.push(`${filename} (error from erag: ${e as string})})`)
       return null
     }
   }
@@ -400,11 +399,11 @@ ${filename}: ${summary}
 `
       }
       // ask chatgpt to summarize the summaries
-      const summarizeResp = await heavyBot.chat(
+      const summarizeResp = await reviewBot.chat(
         prompts.renderSummarizeChangesets(inputs)
       )
       if (summarizeResp === '') {
-        warning('summarize: nothing obtained from openai')
+        warning('summarize: nothing obtained from erag')
       } else {
         inputs.rawSummary = summarizeResp
       }
@@ -412,20 +411,20 @@ ${filename}: ${summary}
   }
 
   // final summary
-  const summarizeFinalResponse = await heavyBot.chat(
+  const summarizeFinalResponse = await reviewBot.chat(
     prompts.renderSummarize(inputs)
   )
   if (summarizeFinalResponse === '') {
-    info('summarize: nothing obtained from openai')
+    info('summarize: nothing obtained from erag')
   }
 
   if (options.disableReleaseNotes === false) {
     // final release notes
-    const releaseNotesResponse = await heavyBot.chat(
+    const releaseNotesResponse = await reviewBot.chat(
       prompts.renderSummarizeReleaseNotes(inputs)
     )
     if (releaseNotesResponse === '') {
-      info('release notes: nothing obtained from openai')
+      info('release notes: nothing obtained from erag')
     } else {
       let message = '### Summary by Erag Reviewer\n\n'
       message += releaseNotesResponse
@@ -441,7 +440,7 @@ ${filename}: ${summary}
   }
 
   // generate a short summary as well
-  const summarizeShortResponse = await heavyBot.chat(
+  const summarizeShortResponse = await reviewBot.chat(
     prompts.renderSummarizeShort(inputs)
   )
   inputs.shortSummary = summarizeShortResponse
@@ -523,9 +522,9 @@ ${
       let patchesToPack = 0
       for (const [, , patch] of patches) {
         const patchTokens = getTokenCount(patch)
-        if (tokens + patchTokens > options.heavyTokenLimits.requestTokens) {
+        if (tokens + patchTokens > options.tokenLimits.requestTokens) {
           info(
-            `only packing ${patchesToPack} / ${patches.length} patches, tokens: ${tokens} / ${options.heavyTokenLimits.requestTokens}`
+            `only packing ${patchesToPack} / ${patches.length} patches, tokens: ${tokens} / ${options.tokenLimits.requestTokens}`
           )
           break
         }
@@ -574,10 +573,7 @@ ${
         }
         // try packing comment_chain into this request
         const commentChainTokens = getTokenCount(commentChain)
-        if (
-          tokens + commentChainTokens >
-          options.heavyTokenLimits.requestTokens
-        ) {
+        if (tokens + commentChainTokens > options.tokenLimits.requestTokens) {
           commentChain = ''
         } else {
           tokens += commentChainTokens
@@ -603,11 +599,11 @@ ${commentChain}
       if (patchesPacked > 0) {
         // perform review
         try {
-          const response = await heavyBot.chat(
+          const response = await reviewBot.chat(
             prompts.renderReviewFileDiff(ins)
           )
           if (response === '') {
-            info('review: nothing obtained from openai')
+            info('review: nothing obtained from erag')
             reviewsFailed.push(`${filename} (no response)`)
             return
           }

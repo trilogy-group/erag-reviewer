@@ -21,14 +21,14 @@ async function run(): Promise<void> {
     getBooleanInput('review_comment_lgtm'),
     getMultilineInput('path_filters'),
     getInput('system_message'),
-    getInput('openai_light_model'),
-    getInput('openai_heavy_model'),
-    getInput('openai_model_temperature'),
-    getInput('openai_retries'),
-    getInput('openai_timeout_ms'),
-    getInput('openai_concurrency_limit'),
+    getInput('erag_light_model'),
+    getInput('erag_heavy_model'),
+    getInput('erag_model_temperature'),
+    getInput('erag_retries'),
+    getInput('erag_timeout_ms'),
+    getInput('erag_concurrency_limit'),
     getInput('github_concurrency_limit'),
-    getInput('openai_base_url'),
+    getInput('erag_base_url'),
     getInput('language')
   )
 

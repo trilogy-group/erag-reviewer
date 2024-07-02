@@ -140,35 +140,35 @@ inputs:
     required: false
     description: 'Disable release notes'
     default: 'false'
-  openai_base_url:
+  erag_base_url:
     required: false
-    description: 'The url of the openai api interface.'
+    description: 'The url of the erag api interface.'
     default: 'https://api.openai.com/v1'
-  openai_light_model:
+  erag_light_model:
     required: false
     description:
       'Model to use for simple tasks like summarizing diff on a file.'
     default: 'gpt-4o'
-  openai_heavy_model:
+  erag_heavy_model:
     required: false
     description: 'Model to use for complex tasks such as code reviews.'
     default: 'gpt-4o'
-  openai_model_temperature:
+  erag_model_temperature:
     required: false
-    description: 'Temperature for GPT model'
+    description: 'Temperature for Erag model'
     default: '0.05'
-  openai_retries:
+  erag_retries:
     required: false
     description:
-      'How many times to retry OpenAI API in case of timeouts or errors?'
+      'How many times to retry Erag API in case of timeouts or errors?'
     default: '5'
-  openai_timeout_ms:
+  erag_timeout_ms:
     required: false
-    description: 'Timeout for OpenAI API call in millis'
+    description: 'Timeout for Erag API call in millis'
     default: '360000'
-  openai_concurrency_limit:
+  erag_concurrency_limit:
     required: false
-    description: 'How many concurrent API calls to make to OpenAI servers?'
+    description: 'How many concurrent API calls to make to Erag servers?'
     default: '6'
   github_concurrency_limit:
     required: false
@@ -176,7 +176,7 @@ inputs:
     default: '6'
   system_message:
     required: false
-    description: 'System message to be sent to OpenAI'
+    description: 'System message to be sent to Erag'
     default: |
       You are `Erag Reviewer` (aka `github-actions[bot]`).
       Your purpose is to act as a highly experienced 

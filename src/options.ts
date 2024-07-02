@@ -11,16 +11,16 @@ export class Options {
   reviewCommentLGTM: boolean
   pathFilters: PathFilter
   systemMessage: string
-  openaiLightModel: string
-  openaiHeavyModel: string
-  openaiModelTemperature: number
-  openaiRetries: number
-  openaiTimeoutMS: number
-  openaiConcurrencyLimit: number
+  eragLightModel: string
+  eragHeavyModel: string
+  eragModelTemperature: number
+  eragRetries: number
+  eragTimeoutMS: number
+  eragConcurrencyLimit: number
   githubConcurrencyLimit: number
   lightTokenLimits: TokenLimits
   heavyTokenLimits: TokenLimits
-  apiBaseUrl: string
+  eragBaseUrl: string
   language: string
 
   constructor(
@@ -32,14 +32,14 @@ export class Options {
     reviewCommentLGTM = false,
     pathFilters: string[] | null = null,
     systemMessage = '',
-    openaiLightModel = 'gpt-3.5-turbo',
-    openaiHeavyModel = 'gpt-3.5-turbo',
-    openaiModelTemperature = '0.0',
-    openaiRetries = '3',
-    openaiTimeoutMS = '120000',
-    openaiConcurrencyLimit = '6',
+    eragLightModel = 'gpt-4o',
+    eragHeavyModel = 'gpt-4o',
+    eragModelTemperature = '0.0',
+    eragRetries = '3',
+    eragTimeoutMS = '120000',
+    eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
-    apiBaseUrl = 'https://api.openai.com/v1',
+    eragBaseUrl = 'https://api.openai.com/v1',
     language = 'en-US'
   ) {
     this.debug = debug
@@ -50,16 +50,16 @@ export class Options {
     this.reviewCommentLGTM = reviewCommentLGTM
     this.pathFilters = new PathFilter(pathFilters)
     this.systemMessage = systemMessage
-    this.openaiLightModel = openaiLightModel
-    this.openaiHeavyModel = openaiHeavyModel
-    this.openaiModelTemperature = parseFloat(openaiModelTemperature)
-    this.openaiRetries = parseInt(openaiRetries)
-    this.openaiTimeoutMS = parseInt(openaiTimeoutMS)
-    this.openaiConcurrencyLimit = parseInt(openaiConcurrencyLimit)
+    this.eragLightModel = eragLightModel
+    this.eragHeavyModel = eragHeavyModel
+    this.eragModelTemperature = parseFloat(eragModelTemperature)
+    this.eragRetries = parseInt(eragRetries)
+    this.eragTimeoutMS = parseInt(eragTimeoutMS)
+    this.eragConcurrencyLimit = parseInt(eragConcurrencyLimit)
     this.githubConcurrencyLimit = parseInt(githubConcurrencyLimit)
-    this.lightTokenLimits = new TokenLimits(openaiLightModel)
-    this.heavyTokenLimits = new TokenLimits(openaiHeavyModel)
-    this.apiBaseUrl = apiBaseUrl
+    this.lightTokenLimits = new TokenLimits(eragLightModel)
+    this.heavyTokenLimits = new TokenLimits(eragHeavyModel)
+    this.eragBaseUrl = eragBaseUrl
     this.language = language
   }
 
@@ -73,16 +73,16 @@ export class Options {
     info(`review_comment_lgtm: ${this.reviewCommentLGTM}`)
     info(`path_filters: ${this.pathFilters}`)
     info(`system_message: ${this.systemMessage}`)
-    info(`openai_light_model: ${this.openaiLightModel}`)
-    info(`openai_heavy_model: ${this.openaiHeavyModel}`)
-    info(`openai_model_temperature: ${this.openaiModelTemperature}`)
-    info(`openai_retries: ${this.openaiRetries}`)
-    info(`openai_timeout_ms: ${this.openaiTimeoutMS}`)
-    info(`openai_concurrency_limit: ${this.openaiConcurrencyLimit}`)
+    info(`erag_light_model: ${this.eragLightModel}`)
+    info(`erag_heavy_model: ${this.eragHeavyModel}`)
+    info(`erag_model_temperature: ${this.eragModelTemperature}`)
+    info(`erag_retries: ${this.eragRetries}`)
+    info(`erag_timeout_ms: ${this.eragTimeoutMS}`)
+    info(`erag_concurrency_limit: ${this.eragConcurrencyLimit}`)
     info(`github_concurrency_limit: ${this.githubConcurrencyLimit}`)
     info(`summary_token_limits: ${this.lightTokenLimits.string()}`)
     info(`review_token_limits: ${this.heavyTokenLimits.string()}`)
-    info(`api_base_url: ${this.apiBaseUrl}`)
+    info(`erag_base_url: ${this.eragBaseUrl}`)
     info(`language: ${this.language}`)
   }
 

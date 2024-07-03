@@ -32,7 +32,7 @@ export class Options {
     eragRetries = '3',
     eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
-    eragBaseUrl = 'https://erag.trilogy.com/api/v2/',
+    eragBaseUrl = 'https://erag.trilogy.com/api/v2',
     language = 'en-US'
   ) {
     this.debug = debug

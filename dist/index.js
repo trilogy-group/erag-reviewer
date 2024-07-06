@@ -8182,7 +8182,7 @@ async function run() {
         reviewBot = new _bot__WEBPACK_IMPORTED_MODULE_1__/* .Bot */ .r(options);
     }
     catch (e) {
-        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`Skipped: failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`);
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`Failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`);
         return;
     }
     try {

@@ -42,8 +42,8 @@ async function run(): Promise<void> {
   try {
     reviewBot = new Bot(options)
   } catch (e: any) {
-    warning(
-      `Skipped: failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`
+    setFailed(
+      `Failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`
     )
     return
   }

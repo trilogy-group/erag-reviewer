@@ -57,6 +57,8 @@ export class Options {
 
   // print all options using core.info
   print(): void {
+    info('Printing options\n\n')
+
     info(`debug: ${this.debug}`)
     info(`disable_review: ${this.disableReview}`)
     info(`disable_release_notes: ${this.disableReleaseNotes}`)
@@ -73,6 +75,8 @@ export class Options {
     info(`erag_base_url: ${this.eragBaseUrl}`)
     info(`erag_project_name: ${this.eragProjectName}`)
     info(`language: ${this.language}`)
+
+    info('\n\n')
   }
 
   checkPath(path: string): boolean {

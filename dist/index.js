@@ -7377,13 +7377,7 @@ class Bot {
     chat = async (message) => {
         let res = '';
         try {
-            if (this.options.debug) {
-                (0,core.info)(`chat: ${message}`);
-            }
             res = await this.chat_(message);
-            if (this.options.debug) {
-                (0,core.info)(`chat response: ${res}`);
-            }
             return res;
         }
         catch (e) {
@@ -7392,34 +7386,31 @@ class Bot {
         }
     };
     chat_ = async (message) => {
-        // record timing
-        const start = Date.now();
         if (!message) {
             return '';
         }
-        let response = '';
-        if (this.api != null) {
-            try {
-                response = await pRetry(() => this.api.sendMessage(message), {
-                    retries: this.options.eragRetries
-                });
-            }
-            catch (e) {
-                (0,core.info)(`response: ${response}, failed to send message to erag: ${e.message}, backtrace: ${e.stack}`);
-            }
-            const end = Date.now();
-            (0,core.info)(`response: ${JSON.stringify(response)}`);
-            (0,core.info)(`erag sendMessage (including retries) response time: ${end - start} ms`);
-        }
-        else {
+        if (!this.api) {
             (0,core.setFailed)('The ERAG API is not initialized');
+            return '';
         }
-        if (!response) {
-            (0,core.warning)('erag response is null');
+        const start = Date.now();
+        let response = '';
+        try {
+            if (this.options.debug) {
+                (0,core.info)(`Sending message to erag:\n\n ${message}\n\n`);
+            }
+            response = await pRetry(() => this.api.sendMessage(message), {
+                retries: this.options.eragRetries
+            });
+            if (this.options.debug) {
+                (0,core.info)(`Received response from erag:\n\n ${response}\n\n`);
+            }
         }
-        if (this.options.debug) {
-            (0,core.info)(`erag responses: ${response}`);
+        catch (e) {
+            (0,core.info)(`Failed to send message to erag: ${e.message}, backtrace: ${e.stack}`);
         }
+        const end = Date.now();
+        (0,core.info)(`erag sendMessage (including retries) response time: ${end - start} ms`);
         return response;
     };
 }
@@ -10128,6 +10119,7 @@ class Options {
     }
     // print all options using core.info
     print() {
+        (0,core.info)('Printing options\n\n');
         (0,core.info)(`debug: ${this.debug}`);
         (0,core.info)(`disable_review: ${this.disableReview}`);
         (0,core.info)(`disable_release_notes: ${this.disableReleaseNotes}`);
@@ -10144,6 +10136,7 @@ class Options {
         (0,core.info)(`erag_base_url: ${this.eragBaseUrl}`);
         (0,core.info)(`erag_project_name: ${this.eragProjectName}`);
         (0,core.info)(`language: ${this.language}`);
+        (0,core.info)('\n\n');
     }
     checkPath(path) {
         const ok = this.pathFilters.check(path);

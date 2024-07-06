@@ -29,15 +29,7 @@ export class Bot {
   chat = async (message: string): Promise<string> => {
     let res: string = ''
     try {
-      if (this.options.debug) {
-        info(`chat: ${message}`)
-      }
-
       res = await this.chat_(message)
-
-      if (this.options.debug) {
-        info(`chat response: ${res}`)
-      }
       return res
     } catch (e: any) {
       warning(`Failed to chat: ${e.message}, backtrace: ${e.stack}`)
@@ -46,38 +38,39 @@ export class Bot {
   }
 
   private readonly chat_ = async (message: string): Promise<string> => {
-    // record timing
-    const start = Date.now()
     if (!message) {
       return ''
     }
 
-    let response: string = ''
-
-    if (this.api != null) {
-      try {
-        response = await pRetry(() => this.api!.sendMessage(message), {
-          retries: this.options.eragRetries
-        })
-      } catch (e: any) {
-        info(
-          `response: ${response}, failed to send message to erag: ${e.message}, backtrace: ${e.stack}`
-        )
-      }
-      const end = Date.now()
-      info(`response: ${JSON.stringify(response)}`)
-      info(
-        `erag sendMessage (including retries) response time: ${end - start} ms`
-      )
-    } else {
+    if (!this.api) {
       setFailed('The ERAG API is not initialized')
+      return ''
     }
-    if (!response) {
-      warning('erag response is null')
+
+    const start = Date.now()
+    let response: string = ''
+    try {
+      if (this.options.debug) {
+        info(`Sending message to erag:\n\n ${message}\n\n`)
+      }
+
+      response = await pRetry(() => this.api!.sendMessage(message), {
+        retries: this.options.eragRetries
+      })
+
+      if (this.options.debug) {
+        info(`Received response from erag:\n\n ${response}\n\n`)
+      }
+    } catch (e: any) {
+      info(
+        `Failed to send message to erag: ${e.message}, backtrace: ${e.stack}`
+      )
     }
-    if (this.options.debug) {
-      info(`erag responses: ${response}`)
-    }
+    const end = Date.now()
+    info(
+      `erag sendMessage (including retries) response time: ${end - start} ms`
+    )
+
     return response
   }
 }

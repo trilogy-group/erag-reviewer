@@ -29,7 +29,15 @@ export class Bot {
   chat = async (message: string): Promise<string> => {
     let res: string = ''
     try {
+      if (this.options.debug) {
+        info(`chat: ${message}`)
+      }
+
       res = await this.chat_(message)
+
+      if (this.options.debug) {
+        info(`chat response: ${res}`)
+      }
       return res
     } catch (e: any) {
       warning(`Failed to chat: ${e.message}, backtrace: ${e.stack}`)

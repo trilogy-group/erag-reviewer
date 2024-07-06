@@ -7377,7 +7377,13 @@ class Bot {
     chat = async (message) => {
         let res = '';
         try {
+            if (this.options.debug) {
+                (0,core.info)(`chat: ${message}`);
+            }
             res = await this.chat_(message);
+            if (this.options.debug) {
+                (0,core.info)(`chat response: ${res}`);
+            }
             return res;
         }
         catch (e) {

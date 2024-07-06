@@ -144,6 +144,10 @@ inputs:
     required: false
     description: 'The url of the erag api interface.'
     default: 'https://erag.trilogy.com/api/v2'
+  erag_project_name:
+    required: false
+    description: 'The project name to use when querying erag.'
+    default: ''
   model:
     required: false
     description:

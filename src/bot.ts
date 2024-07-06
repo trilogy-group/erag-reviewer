@@ -12,31 +12,16 @@ export class Bot {
 
   constructor(options: Options) {
     this.options = options
-    if (process.env.OPENAI_API_KEY) {
-      const currentDate = new Date().toISOString().split('T')[0]
-      const systemMessage = `${options.systemMessage} 
-Knowledge cutoff: ${options.tokenLimits.knowledgeCutOff}
-Current date: ${currentDate}
-
-IMPORTANT: Entire response must be in the language with ISO code: ${options.language}
-`
-
-      this.api = new ChatGPTAPI({
-        apiBaseUrl: options.apiBaseUrl,
-        systemMessage,
-        apiKey: process.env.OPENAI_API_KEY,
-        apiOrg: process.env.OPENAI_API_ORG ?? undefined,
-        debug: options.debug,
-        maxModelTokens: openaiOptions.tokenLimits.maxTokens,
-        maxResponseTokens: openaiOptions.tokenLimits.responseTokens,
-        completionParams: {
-          temperature: options.openaiModelTemperature,
-          model: openaiOptions.model
-        }
-      })
+    if (process.env.ERAG_ACCESS_TOKEN) {
+      this.api = new EragAPI(
+        options.eragBaseUrl,
+        options.model,
+        options.eragProjectName,
+        process.env.ERAG_ACCESS_TOKEN
+      )
     } else {
       const err =
-        "Unable to initialize the OpenAI API, both 'OPENAI_API_KEY' environment variable are not available"
+        "Unable to initialize the ERAG API, 'ERAG_ACCESS_TOKEN' environment variable is not available"
       throw new Error(err)
     }
   }
@@ -46,10 +31,8 @@ IMPORTANT: Entire response must be in the language with ISO code: ${options.lang
     try {
       res = await this.chat_(message)
       return res
-    } catch (e: unknown) {
-      if (e instanceof ChatGPTError) {
-        warning(`Failed to chat: ${e}, backtrace: ${e.stack}`)
-      }
+    } catch (e: any) {
+      warning(`Failed to chat: ${e.message}, backtrace: ${e.stack}`)
       return res
     }
   }
@@ -61,46 +44,32 @@ IMPORTANT: Entire response must be in the language with ISO code: ${options.lang
       return ''
     }
 
-    let response: ChatMessage | undefined
+    let response: string = ''
 
     if (this.api != null) {
-      const opts: SendMessageOptions = {
-        timeoutMs: this.options.openaiTimeoutMS
-      }
       try {
-        response = await pRetry(() => this.api!.sendMessage(message, opts), {
-          retries: this.options.openaiRetries
+        response = await pRetry(() => this.api!.sendMessage(message), {
+          retries: this.options.eragRetries
         })
-      } catch (e: unknown) {
-        if (e instanceof ChatGPTError) {
-          info(
-            `response: ${response}, failed to send message to openai: ${e}, backtrace: ${e.stack}`
-          )
-        }
+      } catch (e: any) {
+        info(
+          `response: ${response}, failed to send message to erag: ${e.message}, backtrace: ${e.stack}`
+        )
       }
       const end = Date.now()
       info(`response: ${JSON.stringify(response)}`)
       info(
-        `openai sendMessage (including retries) response time: ${
-          end - start
-        } ms`
+        `erag sendMessage (including retries) response time: ${end - start} ms`
       )
     } else {
-      setFailed('The OpenAI API is not initialized')
+      setFailed('The ERAG API is not initialized')
     }
-    let responseText = ''
-    if (response != null) {
-      responseText = response.text
-    } else {
-      warning('openai response is null')
-    }
-    // remove the prefix "with " in the response
-    if (responseText.startsWith('with ')) {
-      responseText = responseText.substring(5)
+    if (!response) {
+      warning('erag response is null')
     }
     if (this.options.debug) {
-      info(`openai responses: ${responseText}`)
+      info(`erag responses: ${response}`)
     }
-    return responseText
+    return response
   }
 }

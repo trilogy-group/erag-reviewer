@@ -11,16 +11,13 @@ export class Options {
   reviewCommentLGTM: boolean
   pathFilters: PathFilter
   systemMessage: string
-  openaiLightModel: string
-  openaiHeavyModel: string
-  openaiModelTemperature: number
-  openaiRetries: number
-  openaiTimeoutMS: number
-  openaiConcurrencyLimit: number
+  model: string
+  eragRetries: number
+  eragConcurrencyLimit: number
   githubConcurrencyLimit: number
-  lightTokenLimits: TokenLimits
-  heavyTokenLimits: TokenLimits
-  apiBaseUrl: string
+  tokenLimits: TokenLimits
+  eragBaseUrl: string
+  eragProjectName: string
   language: string
 
   constructor(
@@ -32,14 +29,12 @@ export class Options {
     reviewCommentLGTM = false,
     pathFilters: string[] | null = null,
     systemMessage = '',
-    openaiLightModel = 'gpt-3.5-turbo',
-    openaiHeavyModel = 'gpt-3.5-turbo',
-    openaiModelTemperature = '0.0',
-    openaiRetries = '3',
-    openaiTimeoutMS = '120000',
-    openaiConcurrencyLimit = '6',
+    model = 'gpt-4o',
+    eragRetries = '3',
+    eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
-    apiBaseUrl = 'https://api.openai.com/v1',
+    eragBaseUrl = 'https://erag.trilogy.com/api/v2',
+    eragProjectName = '',
     language = 'en-US'
   ) {
     this.debug = debug
@@ -50,21 +45,20 @@ export class Options {
     this.reviewCommentLGTM = reviewCommentLGTM
     this.pathFilters = new PathFilter(pathFilters)
     this.systemMessage = systemMessage
-    this.openaiLightModel = openaiLightModel
-    this.openaiHeavyModel = openaiHeavyModel
-    this.openaiModelTemperature = parseFloat(openaiModelTemperature)
-    this.openaiRetries = parseInt(openaiRetries)
-    this.openaiTimeoutMS = parseInt(openaiTimeoutMS)
-    this.openaiConcurrencyLimit = parseInt(openaiConcurrencyLimit)
+    this.model = model
+    this.eragRetries = parseInt(eragRetries)
+    this.eragConcurrencyLimit = parseInt(eragConcurrencyLimit)
     this.githubConcurrencyLimit = parseInt(githubConcurrencyLimit)
-    this.lightTokenLimits = new TokenLimits(openaiLightModel)
-    this.heavyTokenLimits = new TokenLimits(openaiHeavyModel)
-    this.apiBaseUrl = apiBaseUrl
+    this.tokenLimits = new TokenLimits(model)
+    this.eragBaseUrl = eragBaseUrl
+    this.eragProjectName = eragProjectName
     this.language = language
   }
 
   // print all options using core.info
   print(): void {
+    info('Printing options\n\n')
+
     info(`debug: ${this.debug}`)
     info(`disable_review: ${this.disableReview}`)
     info(`disable_release_notes: ${this.disableReleaseNotes}`)
@@ -73,17 +67,16 @@ export class Options {
     info(`review_comment_lgtm: ${this.reviewCommentLGTM}`)
     info(`path_filters: ${this.pathFilters}`)
     info(`system_message: ${this.systemMessage}`)
-    info(`openai_light_model: ${this.openaiLightModel}`)
-    info(`openai_heavy_model: ${this.openaiHeavyModel}`)
-    info(`openai_model_temperature: ${this.openaiModelTemperature}`)
-    info(`openai_retries: ${this.openaiRetries}`)
-    info(`openai_timeout_ms: ${this.openaiTimeoutMS}`)
-    info(`openai_concurrency_limit: ${this.openaiConcurrencyLimit}`)
+    info(`model: ${this.model}`)
+    info(`erag_retries: ${this.eragRetries}`)
+    info(`erag_concurrency_limit: ${this.eragConcurrencyLimit}`)
     info(`github_concurrency_limit: ${this.githubConcurrencyLimit}`)
-    info(`summary_token_limits: ${this.lightTokenLimits.string()}`)
-    info(`review_token_limits: ${this.heavyTokenLimits.string()}`)
-    info(`api_base_url: ${this.apiBaseUrl}`)
+    info(`token_limits: ${this.tokenLimits.string()}`)
+    info(`erag_base_url: ${this.eragBaseUrl}`)
+    info(`erag_project_name: ${this.eragProjectName}`)
     info(`language: ${this.language}`)
+
+    info('\n\n')
   }
 
   checkPath(path: string): boolean {
@@ -135,19 +128,5 @@ export class PathFilter {
     }
 
     return (!inclusionRuleExists || included) && !excluded
-  }
-}
-
-export class OpenAIOptions {
-  model: string
-  tokenLimits: TokenLimits
-
-  constructor(model = 'gpt-3.5-turbo', tokenLimits: TokenLimits | null = null) {
-    this.model = model
-    if (tokenLimits != null) {
-      this.tokenLimits = tokenLimits
-    } else {
-      this.tokenLimits = new TokenLimits(model)
-    }
   }
 }

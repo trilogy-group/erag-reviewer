@@ -17,10 +17,10 @@ import {getTokenCount} from './tokenizer'
 // eslint-disable-next-line camelcase
 const context = github_context
 const repo = context.repo
-const ASK_BOT = '@coderabbitai'
+const ASK_BOT = '@askErag'
 
 export const handleReviewComment = async (
-  heavyBot: Bot,
+  reviewBot: Bot,
   options: Options,
   prompts: Prompts
 ) => {
@@ -131,7 +131,7 @@ export const handleReviewComment = async (
       // get tokens so far
       let tokens = getTokenCount(prompts.renderComment(inputs))
 
-      if (tokens > options.heavyTokenLimits.requestTokens) {
+      if (tokens > options.tokenLimits.requestTokens) {
         await commenter.reviewCommentReply(
           pullNumber,
           topLevelComment,
@@ -147,7 +147,7 @@ export const handleReviewComment = async (
         if (
           fileDiffCount > 0 &&
           tokens + fileDiffTokens * fileDiffCount <=
-            options.heavyTokenLimits.requestTokens
+            options.tokenLimits.requestTokens
         ) {
           tokens += fileDiffTokens * fileDiffCount
           inputs.fileDiff = fileDiff
@@ -163,16 +163,13 @@ export const handleReviewComment = async (
         // pack short summary into the inputs if it is not too long
         const shortSummary = commenter.getShortSummary(summary.body)
         const shortSummaryTokens = getTokenCount(shortSummary)
-        if (
-          tokens + shortSummaryTokens <=
-          options.heavyTokenLimits.requestTokens
-        ) {
+        if (tokens + shortSummaryTokens <= options.tokenLimits.requestTokens) {
           tokens += shortSummaryTokens
           inputs.shortSummary = shortSummary
         }
       }
 
-      const [reply] = await heavyBot.chat(prompts.renderComment(inputs), {})
+      const reply = await reviewBot.chat(prompts.renderComment(inputs))
 
       await commenter.reviewCommentReply(pullNumber, topLevelComment, reply)
     }

@@ -108,11 +108,11 @@ jobs:
   OpenAI API if you have multiple. Please add this key to your GitHub Action
   secrets.
 
-### Models: `gpt-4` and `gpt-3.5-turbo`
+### Models: `gpt-4o`
 
-Recommend using `gpt-3.5-turbo` for lighter tasks such as summarizing the
-changes (`openai_light_model` in configuration) and `gpt-4` for more complex
-review and commenting tasks (`openai_heavy_model` in configuration).
+Recommend using `gpt-4o` for both lighter tasks such as summarizing the
+changes (`erag_light_model` in configuration) and more complex
+review and commenting tasks (`erag_heavy_model` in configuration).
 
 Costs: `gpt-3.5-turbo` is dirt cheap. `gpt-4` is orders of magnitude more
 expensive, but the results are vastly superior. We are typically spending $20 a
@@ -161,7 +161,7 @@ system_message: |
 
 You can reply to a review comment made by this action and get a response based
 on the diff context. Additionally, you can invite the bot to a conversation by
-tagging it in the comment (`@coderabbitai`).
+tagging it in the comment (`@askErag`).
 
 Example:
 
@@ -177,7 +177,7 @@ to review documentation, you can ignore PRs that only change the documentation.
 To ignore a PR, add the following keyword in the PR description:
 
 ```text
-@coderabbitai: ignore
+@erag: ignore
 ```
 
 ## Examples

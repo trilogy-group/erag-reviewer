@@ -1,9 +1,5 @@
 name: 'AI-based PR Reviewer & Summarizer with Chat Capabilities'
 description: 'AI-based PR Reviewer & Summarizer with Chat Capabilities'
-branding:
-  icon: 'git-merge'
-  color: 'orange'
-author: 'CodeRabbit LLC'
 inputs:
   debug:
     required: false
@@ -144,35 +140,27 @@ inputs:
     required: false
     description: 'Disable release notes'
     default: 'false'
-  openai_base_url:
+  erag_base_url:
     required: false
-    description: 'The url of the openai api interface.'
-    default: 'https://api.openai.com/v1'
-  openai_light_model:
+    description: 'The url of the erag api interface.'
+    default: 'https://erag.trilogy.com/api/v2'
+  erag_project_name:
     required: false
-    description:
-      'Model to use for simple tasks like summarizing diff on a file.'
-    default: 'gpt-3.5-turbo'
-  openai_heavy_model:
-    required: false
-    description: 'Model to use for complex tasks such as code reviews.'
-    default: 'gpt-4'
-  openai_model_temperature:
-    required: false
-    description: 'Temperature for GPT model'
-    default: '0.05'
-  openai_retries:
+    description: 'The project name to use when querying erag.'
+    default: ''
+  model:
     required: false
     description:
-      'How many times to retry OpenAI API in case of timeouts or errors?'
-    default: '5'
-  openai_timeout_ms:
+      'Model to use for review.'
+    default: 'gpt-4o'
+  erag_retries:
     required: false
-    description: 'Timeout for OpenAI API call in millis'
-    default: '360000'
-  openai_concurrency_limit:
+    description:
+      'How many times to retry Erag API in case of timeouts or errors?'
+    default: '3'
+  erag_concurrency_limit:
     required: false
-    description: 'How many concurrent API calls to make to OpenAI servers?'
+    description: 'How many concurrent API calls to make to Erag servers?'
     default: '6'
   github_concurrency_limit:
     required: false
@@ -180,10 +168,10 @@ inputs:
     default: '6'
   system_message:
     required: false
-    description: 'System message to be sent to OpenAI'
+    description: 'System message to be sent to Erag'
     default: |
-      You are `@coderabbitai` (aka `github-actions[bot]`), a language model 
-      trained by OpenAI. Your purpose is to act as a highly experienced 
+      You are `Erag Reviewer` (aka `github-actions[bot]`).
+      Your purpose is to act as a highly experienced 
       software engineer and provide a thorough review of the code hunks
       and suggest code snippets to improve key areas such as:
         - Logic
@@ -212,9 +200,6 @@ inputs:
         specific files within 80 words.
       - **Changes**: A markdown table of files and their summaries. Group files 
         with similar changes together into a single row to save space.
-      - **Poem**: Below the changes, include a whimsical, short poem written by 
-        a rabbit to celebrate the changes. Format the poem as a quote using 
-        the ">" symbol and feel free to use emojis where relevant.
 
       Avoid additional commentary as this summary will be added as a comment on the 
       GitHub pull request. Use the titles "Walkthrough" and "Changes" and they must be H2.
@@ -237,7 +222,7 @@ inputs:
   bot_icon:
     required: false
     description: 'The icon for the bot'
-    default: '<img src="https://github.com/trilogy-group/ai-pr-reviewer/blob/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">'
+    default: '<img src="https://raw.githubusercontent.com/trilogy-group/ai-pr-reviewer/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">'
 runs:
   using: 'node16'
   main: 'dist/index.js'

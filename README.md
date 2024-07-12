@@ -127,7 +127,13 @@ To ignore a PR, add the following keyword in the PR description:
 
 Some of the reviews done by erag-reviewer
 
----COMING SOON---
+![PR Changes Summary](./docs/images/erag-changes-summary.png)
+
+![PR Review Summary](./docs/images/erag-review-summary.png)
+
+![Comment Reply](./docs/images/erag-comment-reply.png)
+
+![Comment Reply with Context](./docs/images/erag-review-comment-with-sr-context.png)
 
 Any suggestions or pull requests for improving the prompts are highly
 appreciated.

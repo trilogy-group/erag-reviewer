@@ -19,6 +19,9 @@ export class TokenLimits {
       // gpt-4o has 128k token size but we set to 32k for now
       this.maxTokens = 32600
       this.responseTokens = 4000
+    } else if (model === 'bedrock-claude3.5-sonnet') {
+      this.maxTokens = 16000
+      this.responseTokens = 4000
     } else {
       this.maxTokens = 4000
       this.responseTokens = 1000

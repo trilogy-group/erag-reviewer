@@ -10066,6 +10066,10 @@ class TokenLimits {
             this.maxTokens = 32600;
             this.responseTokens = 4000;
         }
+        else if (model === 'bedrock-claude3.5-sonnet') {
+            this.maxTokens = 16000;
+            this.responseTokens = 4000;
+        }
         else {
             this.maxTokens = 4000;
             this.responseTokens = 1000;

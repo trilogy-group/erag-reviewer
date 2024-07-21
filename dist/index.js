@@ -10362,6 +10362,12 @@ There's a syntax error in the add function.
 -    retrn z
 +    return z
 \`\`\`
+
+Suggested fix:
+\`\`\`suggestion
+    return z
+\`\`\`
+
 ---
 24-25:
 LGTM!

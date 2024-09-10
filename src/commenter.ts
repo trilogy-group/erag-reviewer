@@ -1,4 +1,4 @@
-import {getInput, info, warning} from '@actions/core'
+import {info, warning} from '@actions/core'
 // eslint-disable-next-line camelcase
 import {context as github_context} from '@actions/github'
 import {octokit} from './octokit'
@@ -7,40 +7,37 @@ import {octokit} from './octokit'
 const context = github_context
 const repo = context.repo
 
-export const COMMENT_GREETING = `${getInput('bot_icon')}   ERAG Reviewer`
+const botIcon = `<img src="https://raw.githubusercontent.com/trilogy-group/ai-pr-reviewer/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">`
+const botName = 'ERAG Reviewer'
 
-export const COMMENT_TAG =
-  '<!-- This is an auto-generated comment by ERAG Reviewer -->'
+export const COMMENT_GREETING = `${botIcon}   ${botName}`
 
-export const COMMENT_REPLY_TAG =
-  '<!-- This is an auto-generated reply by ERAG Reviewer -->'
+export const COMMENT_TAG = `<!-- This is an auto-generated comment by ${botName} -->`
 
-export const SUMMARIZE_TAG =
-  '<!-- This is an auto-generated comment: summarize by ERAG Reviewer -->'
+export const COMMENT_REPLY_TAG = `<!-- This is an auto-generated reply by ${botName} -->`
 
-export const IN_PROGRESS_START_TAG =
-  '<!-- This is an auto-generated comment: summarize review in progress by ERAG Reviewer -->'
+export const SUMMARIZE_TAG = `<!-- This is an auto-generated comment: summarize by ${botName} -->`
 
-export const IN_PROGRESS_END_TAG =
-  '<!-- end of auto-generated comment: summarize review in progress by ERAG Reviewer -->'
+export const IN_PROGRESS_START_TAG = `<!-- This is an auto-generated comment: summarize review in progress by ${botName} -->`
 
-export const DESCRIPTION_START_TAG =
-  '<!-- This is an auto-generated comment: release notes by ERAG Reviewer -->'
-export const DESCRIPTION_END_TAG =
-  '<!-- end of auto-generated comment: release notes by ERAG Reviewer -->'
+export const IN_PROGRESS_END_TAG = `<!-- end of auto-generated comment: summarize review in progress by ${botName} -->`
 
-export const RAW_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: raw summary by ERAG Reviewer -->
+export const DESCRIPTION_START_TAG = `<!-- This is an auto-generated comment: release notes by ${botName} -->`
+
+export const DESCRIPTION_END_TAG = `<!-- end of auto-generated comment: release notes by ${botName} -->`
+
+export const RAW_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: raw summary by ${botName} -->
 <!--
 `
 export const RAW_SUMMARY_END_TAG = `-->
-<!-- end of auto-generated comment: raw summary by ERAG Reviewer -->`
+<!-- end of auto-generated comment: raw summary by ${botName} -->`
 
-export const SHORT_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: short summary by ERAG Reviewer -->
+export const SHORT_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: short summary by ${botName} -->
 <!--
 `
 
 export const SHORT_SUMMARY_END_TAG = `-->
-<!-- end of auto-generated comment: short summary by ERAG Reviewer -->`
+<!-- end of auto-generated comment: short summary by ${botName} -->`
 
 export const COMMIT_ID_START_TAG = '<!-- commit_ids_reviewed_start -->'
 export const COMMIT_ID_END_TAG = '<!-- commit_ids_reviewed_end -->'

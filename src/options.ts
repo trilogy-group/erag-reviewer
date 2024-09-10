@@ -18,7 +18,6 @@ export class Options {
   tokenLimits: TokenLimits
   eragBaseUrl: string
   eragProjectName: string
-  language: string
 
   constructor(
     debug: boolean,
@@ -34,8 +33,7 @@ export class Options {
     eragConcurrencyLimit = '6',
     githubConcurrencyLimit = '6',
     eragBaseUrl = 'https://erag.trilogy.com/api/v2',
-    eragProjectName = '',
-    language = 'en-US'
+    eragProjectName = ''
   ) {
     this.debug = debug
     this.disableReview = disableReview
@@ -52,7 +50,6 @@ export class Options {
     this.tokenLimits = new TokenLimits(model)
     this.eragBaseUrl = eragBaseUrl
     this.eragProjectName = eragProjectName
-    this.language = language
   }
 
   // print all options using core.info
@@ -74,7 +71,6 @@ export class Options {
     info(`token_limits: ${this.tokenLimits.string()}`)
     info(`erag_base_url: ${this.eragBaseUrl}`)
     info(`erag_project_name: ${this.eragProjectName}`)
-    info(`language: ${this.language}`)
 
     info('\n\n')
   }

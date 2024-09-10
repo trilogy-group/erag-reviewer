@@ -26,8 +26,7 @@ async function run(): Promise<void> {
     getInput('erag_concurrency_limit'),
     getInput('github_concurrency_limit'),
     getInput('erag_base_url'),
-    getInput('erag_project_name'),
-    getInput('language')
+    getInput('erag_project_name')
   )
 
   // print options

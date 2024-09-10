@@ -7445,24 +7445,26 @@ class Bot {
 // eslint-disable-next-line camelcase
 const context = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context;
 const repo = context.repo;
-const COMMENT_GREETING = `${(0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('bot_icon')}   ERAG Reviewer`;
-const COMMENT_TAG = '<!-- This is an auto-generated comment by ERAG Reviewer -->';
-const COMMENT_REPLY_TAG = '<!-- This is an auto-generated reply by ERAG Reviewer -->';
-const SUMMARIZE_TAG = '<!-- This is an auto-generated comment: summarize by ERAG Reviewer -->';
-const IN_PROGRESS_START_TAG = '<!-- This is an auto-generated comment: summarize review in progress by ERAG Reviewer -->';
-const IN_PROGRESS_END_TAG = '<!-- end of auto-generated comment: summarize review in progress by ERAG Reviewer -->';
-const DESCRIPTION_START_TAG = '<!-- This is an auto-generated comment: release notes by ERAG Reviewer -->';
-const DESCRIPTION_END_TAG = '<!-- end of auto-generated comment: release notes by ERAG Reviewer -->';
-const RAW_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: raw summary by ERAG Reviewer -->
+const botIcon = `<img src="https://raw.githubusercontent.com/trilogy-group/ai-pr-reviewer/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">`;
+const botName = 'ERAG Reviewer';
+const COMMENT_GREETING = `${botIcon}   ${botName}`;
+const COMMENT_TAG = `<!-- This is an auto-generated comment by ${botName} -->`;
+const COMMENT_REPLY_TAG = `<!-- This is an auto-generated reply by ${botName} -->`;
+const SUMMARIZE_TAG = `<!-- This is an auto-generated comment: summarize by ${botName} -->`;
+const IN_PROGRESS_START_TAG = `<!-- This is an auto-generated comment: summarize review in progress by ${botName} -->`;
+const IN_PROGRESS_END_TAG = `<!-- end of auto-generated comment: summarize review in progress by ${botName} -->`;
+const DESCRIPTION_START_TAG = `<!-- This is an auto-generated comment: release notes by ${botName} -->`;
+const DESCRIPTION_END_TAG = `<!-- end of auto-generated comment: release notes by ${botName} -->`;
+const RAW_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: raw summary by ${botName} -->
 <!--
 `;
 const RAW_SUMMARY_END_TAG = `-->
-<!-- end of auto-generated comment: raw summary by ERAG Reviewer -->`;
-const SHORT_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: short summary by ERAG Reviewer -->
+<!-- end of auto-generated comment: raw summary by ${botName} -->`;
+const SHORT_SUMMARY_START_TAG = `<!-- This is an auto-generated comment: short summary by ${botName} -->
 <!--
 `;
 const SHORT_SUMMARY_END_TAG = `-->
-<!-- end of auto-generated comment: short summary by ERAG Reviewer -->`;
+<!-- end of auto-generated comment: short summary by ${botName} -->`;
 const COMMIT_ID_START_TAG = '<!-- commit_ids_reviewed_start -->';
 const COMMIT_ID_END_TAG = '<!-- commit_ids_reviewed_end -->';
 class Commenter {
@@ -8170,7 +8172,7 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 async function run() {
-    const options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('debug'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_review'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_release_notes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('max_files'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_simple_changes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_comment_lgtm'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)('path_filters'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('system_message'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('model'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_retries'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_base_url'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_project_name'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('language'));
+    const options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('debug'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_review'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_release_notes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('max_files'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_simple_changes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_comment_lgtm'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)('path_filters'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('system_message'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('model'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_retries'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_base_url'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_project_name'));
     // print options
     options.print();
     const prompts = new _prompts__WEBPACK_IMPORTED_MODULE_5__/* .Prompts */ .j((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('summarize'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('summarize_release_notes'));
@@ -10102,8 +10104,7 @@ class Options {
     tokenLimits;
     eragBaseUrl;
     eragProjectName;
-    language;
-    constructor(debug, disableReview, disableReleaseNotes, maxFiles = '0', reviewSimpleChanges = false, reviewCommentLGTM = false, pathFilters = null, systemMessage = '', model = 'gpt-4o', eragRetries = '3', eragConcurrencyLimit = '6', githubConcurrencyLimit = '6', eragBaseUrl = 'https://erag.trilogy.com/api/v2', eragProjectName = '', language = 'en-US') {
+    constructor(debug, disableReview, disableReleaseNotes, maxFiles = '0', reviewSimpleChanges = false, reviewCommentLGTM = false, pathFilters = null, systemMessage = '', model = 'gpt-4o', eragRetries = '3', eragConcurrencyLimit = '6', githubConcurrencyLimit = '6', eragBaseUrl = 'https://erag.trilogy.com/api/v2', eragProjectName = '') {
         this.debug = debug;
         this.disableReview = disableReview;
         this.disableReleaseNotes = disableReleaseNotes;
@@ -10119,7 +10120,6 @@ class Options {
         this.tokenLimits = new TokenLimits(model);
         this.eragBaseUrl = eragBaseUrl;
         this.eragProjectName = eragProjectName;
-        this.language = language;
     }
     // print all options using core.info
     print() {
@@ -10139,7 +10139,6 @@ class Options {
         (0,core.info)(`token_limits: ${this.tokenLimits.string()}`);
         (0,core.info)(`erag_base_url: ${this.eragBaseUrl}`);
         (0,core.info)(`erag_project_name: ${this.eragProjectName}`);
-        (0,core.info)(`language: ${this.language}`);
         (0,core.info)('\n\n');
     }
     checkPath(path) {

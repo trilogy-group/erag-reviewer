@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 1444:
+/***/ 2394:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -7322,7 +7322,35 @@ axios.default = axios;
 // this module should only have a default export
 /* harmony default export */ const lib_axios = (axios);
 
+;// CONCATENATED MODULE: ./node_modules/axios/index.js
+
+
+// This module is intended to unwrap Axios default export as named.
+// Keep top-level export same with static properties
+// so that it can keep same with es module or cjs
+const {
+  Axios: axios_Axios,
+  AxiosError: axios_AxiosError,
+  CanceledError: axios_CanceledError,
+  isCancel: axios_isCancel,
+  CancelToken: axios_CancelToken,
+  VERSION: axios_VERSION,
+  all: axios_all,
+  Cancel,
+  isAxiosError: axios_isAxiosError,
+  spread: axios_spread,
+  toFormData: axios_toFormData,
+  AxiosHeaders: axios_AxiosHeaders,
+  HttpStatusCode: axios_HttpStatusCode,
+  formToJSON,
+  getAdapter,
+  mergeConfig: axios_mergeConfig
+} = lib_axios;
+
+
+
 ;// CONCATENATED MODULE: ./lib/erag.js
+
 
 class EragAPI {
     model;
@@ -7354,8 +7382,8 @@ class EragAPI {
             return response.data.response.text;
         }
         catch (error) {
-            if (error.response.status === 403) {
-                throw new Error('Unauthorized: Please check your ERAG_ACCESS_TOKEN');
+            if (axios_isAxiosError(error) && error.response?.status === 403) {
+                (0,core.setFailed)('Unauthorized: Please check your ERAG_ACCESS_TOKEN');
             }
             throw new Error(error);
         }
@@ -8166,7 +8194,7 @@ __nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__, __we
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _bot__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1444);
+/* harmony import */ var _bot__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(2394);
 /* harmony import */ var _options__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1846);
 /* harmony import */ var _prompts__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(4272);
 /* harmony import */ var _review__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(2612);

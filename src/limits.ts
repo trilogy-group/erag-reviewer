@@ -30,7 +30,16 @@ export class TokenLimits {
     this.requestTokens = this.maxTokens - this.responseTokens - 100
   }
 
-  string(): string {
-    return `max_tokens=${this.maxTokens}, request_tokens=${this.requestTokens}, response_tokens=${this.responseTokens}`
+  toString(): string {
+    return JSON.stringify(
+      Object.fromEntries(
+        Object.entries(this).map(([key, value]) => [
+          key,
+          typeof value === 'number' ? Math.round(value) : value
+        ])
+      ),
+      null,
+      2
+    )
   }
 }

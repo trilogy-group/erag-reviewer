@@ -5,6 +5,14 @@ inputs:
     required: false
     description: 'Enable debug mode'
     default: 'false'
+  disable_review:
+    required: false
+    description: 'Only provide the summary and skip the code review.'
+    default: 'false'
+  disable_release_notes:
+    required: false
+    description: 'Disable release notes'
+    default: 'false'
   max_files:
     required: false
     description:
@@ -132,40 +140,6 @@ inputs:
       !**/*.min.js.css
       !**/*.tfstate
       !**/*.tfstate.backup
-  disable_review:
-    required: false
-    description: 'Only provide the summary and skip the code review.'
-    default: 'false'
-  disable_release_notes:
-    required: false
-    description: 'Disable release notes'
-    default: 'false'
-  erag_base_url:
-    required: false
-    description: 'The url of the erag api interface.'
-    default: 'https://erag.trilogy.com/api/v2'
-  erag_project_name:
-    required: false
-    description: 'The project name to use when querying erag.'
-    default: ''
-  model:
-    required: false
-    description:
-      'Model to use for review.'
-    default: 'gpt-4o'
-  erag_retries:
-    required: false
-    description:
-      'How many times to retry Erag API in case of timeouts or errors?'
-    default: '3'
-  erag_concurrency_limit:
-    required: false
-    description: 'How many concurrent API calls to make to Erag servers?'
-    default: '6'
-  github_concurrency_limit:
-    required: false
-    description: 'How many concurrent API calls to make to GitHub?'
-    default: '6'
   system_message:
     required: false
     description: 'System message to be sent to Erag'
@@ -190,30 +164,32 @@ inputs:
       comments/documentation. Identify and resolve significant 
       concerns to improve overall code quality while deliberately 
       disregarding minor issues.
-  summarize:
-    required: false
-    description: 'The prompt for final summarization response'
-    default: |
-      Provide your final response in markdown with the following content:
-
-      - **Walkthrough**: A high-level summary of the overall change instead of 
-        specific files within 80 words.
-      - **Changes**: A markdown table of files and their summaries. Group files 
-        with similar changes together into a single row to save space.
-
-      Avoid additional commentary as this summary will be added as a comment on the 
-      GitHub pull request. Use the titles "Walkthrough" and "Changes" and they must be H2.
-  summarize_release_notes:
+  model:
     required: false
     description:
-      'The prompt for generating release notes in the same chat as summarize
-      stage'
-    default: |
-      Craft concise release notes for the pull request. 
-      Focus on the purpose and user impact, categorizing changes as "New Feature", "Bug Fix", 
-      "Documentation", "Refactor", "Style", "Test", "Chore", or "Revert". Provide a bullet-point list, 
-      e.g., "- New Feature: Added search functionality to the UI". Limit your response to 50-100 words 
-      and emphasize features visible to the end-user while omitting code-level details.
+      'Model to use for review.'
+    default: 'gpt-4o'
+  erag_retries:
+    required: false
+    description:
+      'How many times to retry Erag API in case of timeouts or errors?'
+    default: '3'
+  erag_concurrency_limit:
+    required: false
+    description: 'How many concurrent API calls to make to Erag servers?'
+    default: '6'
+  github_concurrency_limit:
+    required: false
+    description: 'How many concurrent API calls to make to GitHub?'
+    default: '6'
+  erag_base_url:
+    required: false
+    description: 'The url of the erag api interface.'
+    default: 'https://erag.trilogy.com/api/v2'
+  erag_project_name:
+    required: false
+    description: 'The project name to use when querying erag.'
+    default: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

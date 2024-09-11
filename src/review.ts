@@ -145,7 +145,7 @@ export const codeReview = async (
   const filterSelectedFiles = []
   const filterIgnoredFiles = []
   for (const file of files) {
-    if (!options.checkPath(file.filename)) {
+    if (!options.pathFilters.check(file.filename)) {
       info(`skip for excluded path: ${file.filename}`)
       filterIgnoredFiles.push(file)
     } else {

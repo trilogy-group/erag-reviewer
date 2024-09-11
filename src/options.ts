@@ -1,6 +1,6 @@
-import {info} from '@actions/core'
-import {minimatch} from 'minimatch'
+import {getBooleanInput, getInput, getMultilineInput} from '@actions/core'
 import {TokenLimits} from './limits'
+import {PathFilter} from './pathFilter'
 
 export class Options {
   debug: boolean
@@ -15,114 +15,36 @@ export class Options {
   eragRetries: number
   eragConcurrencyLimit: number
   githubConcurrencyLimit: number
-  tokenLimits: TokenLimits
   eragBaseUrl: string
   eragProjectName: string
+  tokenLimits: TokenLimits
 
-  constructor(
-    debug: boolean,
-    disableReview: boolean,
-    disableReleaseNotes: boolean,
-    maxFiles = '0',
-    reviewSimpleChanges = false,
-    reviewCommentLGTM = false,
-    pathFilters: string[] | null = null,
-    systemMessage = '',
-    model = 'gpt-4o',
-    eragRetries = '3',
-    eragConcurrencyLimit = '6',
-    githubConcurrencyLimit = '6',
-    eragBaseUrl = 'https://erag.trilogy.com/api/v2',
-    eragProjectName = ''
-  ) {
-    this.debug = debug
-    this.disableReview = disableReview
-    this.disableReleaseNotes = disableReleaseNotes
-    this.maxFiles = parseInt(maxFiles)
-    this.reviewSimpleChanges = reviewSimpleChanges
-    this.reviewCommentLGTM = reviewCommentLGTM
-    this.pathFilters = new PathFilter(pathFilters)
-    this.systemMessage = systemMessage
-    this.model = model
-    this.eragRetries = parseInt(eragRetries)
-    this.eragConcurrencyLimit = parseInt(eragConcurrencyLimit)
-    this.githubConcurrencyLimit = parseInt(githubConcurrencyLimit)
-    this.tokenLimits = new TokenLimits(model)
-    this.eragBaseUrl = eragBaseUrl
-    this.eragProjectName = eragProjectName
+  constructor() {
+    this.debug = getBooleanInput('debug')
+    this.disableReview = getBooleanInput('disable_review')
+    this.disableReleaseNotes = getBooleanInput('disable_release_notes')
+    this.maxFiles = parseInt(getInput('max_files'))
+    this.reviewSimpleChanges = getBooleanInput('review_simple_changes')
+    this.reviewCommentLGTM = getBooleanInput('review_comment_lgtm')
+    this.pathFilters = new PathFilter(getMultilineInput('path_filters'))
+    this.systemMessage = getInput('system_message')
+    this.model = getInput('model')
+    this.eragRetries = parseInt(getInput('erag_retries'))
+    this.eragConcurrencyLimit = parseInt(getInput('erag_concurrency_limit'))
+    this.githubConcurrencyLimit = parseInt(getInput('github_concurrency_limit'))
+    this.eragBaseUrl = getInput('erag_base_url')
+    this.eragProjectName = getInput('erag_project_name')
+
+    this.tokenLimits = new TokenLimits(this.model)
   }
 
-  // print all options using core.info
-  print(): void {
-    info('Printing options\n\n')
+  toString(): string {
+    let result = 'Options:\n'
 
-    info(`debug: ${this.debug}`)
-    info(`disable_review: ${this.disableReview}`)
-    info(`disable_release_notes: ${this.disableReleaseNotes}`)
-    info(`max_files: ${this.maxFiles}`)
-    info(`review_simple_changes: ${this.reviewSimpleChanges}`)
-    info(`review_comment_lgtm: ${this.reviewCommentLGTM}`)
-    info(`path_filters: ${this.pathFilters}`)
-    info(`system_message: ${this.systemMessage}`)
-    info(`model: ${this.model}`)
-    info(`erag_retries: ${this.eragRetries}`)
-    info(`erag_concurrency_limit: ${this.eragConcurrencyLimit}`)
-    info(`github_concurrency_limit: ${this.githubConcurrencyLimit}`)
-    info(`token_limits: ${this.tokenLimits.string()}`)
-    info(`erag_base_url: ${this.eragBaseUrl}`)
-    info(`erag_project_name: ${this.eragProjectName}`)
-
-    info('\n\n')
-  }
-
-  checkPath(path: string): boolean {
-    const ok = this.pathFilters.check(path)
-    info(`checking path: ${path} => ${ok}`)
-    return ok
-  }
-}
-
-export class PathFilter {
-  private readonly rules: Array<[string /* rule */, boolean /* exclude */]>
-
-  constructor(rules: string[] | null = null) {
-    this.rules = []
-    if (rules != null) {
-      for (const rule of rules) {
-        const trimmed = rule?.trim()
-        if (trimmed) {
-          if (trimmed.startsWith('!')) {
-            this.rules.push([trimmed.substring(1).trim(), true])
-          } else {
-            this.rules.push([trimmed, false])
-          }
-        }
-      }
-    }
-  }
-
-  check(path: string): boolean {
-    if (this.rules.length === 0) {
-      return true
+    for (const [key, value] of Object.entries(this)) {
+      result += `${key}: ${value}\n`
     }
 
-    let included = false
-    let excluded = false
-    let inclusionRuleExists = false
-
-    for (const [rule, exclude] of this.rules) {
-      if (minimatch(path, rule)) {
-        if (exclude) {
-          excluded = true
-        } else {
-          included = true
-        }
-      }
-      if (!exclude) {
-        inclusionRuleExists = true
-      }
-    }
-
-    return (!inclusionRuleExists || included) && !excluded
+    return result
   }
 }

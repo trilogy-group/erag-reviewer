@@ -1,8 +1,25 @@
 import {type Inputs} from './inputs'
 
 export class Prompts {
-  summarize: string
-  summarizeReleaseNotes: string
+  summarize = `
+Provide your final response in markdown with the following content:
+
+- **Walkthrough**: A high-level summary of the overall change instead of 
+  specific files within 80 words.
+- **Changes**: A markdown table of files and their summaries. Group files 
+  with similar changes together into a single row to save space.
+
+Avoid additional commentary as this summary will be added as a comment on the 
+GitHub pull request. Use the titles "Walkthrough" and "Changes" and they must be H2.
+`
+
+  summarizeReleaseNotes = `
+Craft concise release notes for the pull request. 
+Focus on the purpose and user impact, categorizing changes as "New Feature", "Bug Fix", 
+"Documentation", "Refactor", "Style", "Test", "Chore", or "Revert". Provide a bullet-point list, 
+e.g., "- New Feature: Added search functionality to the UI". Limit your response to 50-100 words 
+and emphasize features visible to the end-user while omitting code-level details.
+`
 
   summarizeFileDiff = `## GitHub PR Title
 
@@ -46,7 +63,7 @@ You must strictly follow the format below for triaging the diff:
 [TRIAGE]: <NEEDS_REVIEW or APPROVED>
 
 Important:
-- In your summary do not mention that the file needs a through review or caution about
+- In your summary do not mention that the file needs a thorough review or caution about
   potential issues.
 - Do not provide any reasoning why you triaged the diff as \`NEEDS_REVIEW\` or \`APPROVED\`.
 - Do not mention that these changes affect the logic or functionality of the code in 
@@ -256,11 +273,6 @@ $comment_chain
 $comment
 \`\`\`
 `
-
-  constructor(summarize = '', summarizeReleaseNotes = '') {
-    this.summarize = summarize
-    this.summarizeReleaseNotes = summarizeReleaseNotes
-  }
 
   renderSummarizeFileDiff(
     inputs: Inputs,

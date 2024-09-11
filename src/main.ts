@@ -1,10 +1,4 @@
-import {
-  getBooleanInput,
-  getInput,
-  getMultilineInput,
-  setFailed,
-  warning
-} from '@actions/core'
+import {info, setFailed, warning} from '@actions/core'
 import {Bot} from './bot'
 import {Options} from './options'
 import {Prompts} from './prompts'
@@ -12,30 +6,11 @@ import {codeReview} from './review'
 import {handleReviewComment} from './review-comment'
 
 async function run(): Promise<void> {
-  const options: Options = new Options(
-    getBooleanInput('debug'),
-    getBooleanInput('disable_review'),
-    getBooleanInput('disable_release_notes'),
-    getInput('max_files'),
-    getBooleanInput('review_simple_changes'),
-    getBooleanInput('review_comment_lgtm'),
-    getMultilineInput('path_filters'),
-    getInput('system_message'),
-    getInput('model'),
-    getInput('erag_retries'),
-    getInput('erag_concurrency_limit'),
-    getInput('github_concurrency_limit'),
-    getInput('erag_base_url'),
-    getInput('erag_project_name')
-  )
-
+  const options: Options = new Options()
   // print options
-  options.print()
+  info(options.toString())
 
-  const prompts: Prompts = new Prompts(
-    getInput('summarize'),
-    getInput('summarize_release_notes')
-  )
+  const prompts: Prompts = new Prompts()
 
   let reviewBot: Bot | null = null
   try {

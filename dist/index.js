@@ -8161,7 +8161,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _bot__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1444);
-/* harmony import */ var _options__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(8870);
+/* harmony import */ var _options__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1846);
 /* harmony import */ var _prompts__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(4272);
 /* harmony import */ var _review__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(2612);
 /* harmony import */ var _review_comment__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(5947);
@@ -8172,10 +8172,10 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 async function run() {
-    const options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('debug'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_review'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('disable_release_notes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('max_files'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_simple_changes'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getBooleanInput)('review_comment_lgtm'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getMultilineInput)('path_filters'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('system_message'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('model'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_retries'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('github_concurrency_limit'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_base_url'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('erag_project_name'));
+    const options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E();
     // print options
-    options.print();
-    const prompts = new _prompts__WEBPACK_IMPORTED_MODULE_5__/* .Prompts */ .j((0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('summarize'), (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('summarize_release_notes'));
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(options.toString());
+    const prompts = new _prompts__WEBPACK_IMPORTED_MODULE_5__/* .Prompts */ .j();
     let reviewBot = null;
     try {
         reviewBot = new _bot__WEBPACK_IMPORTED_MODULE_1__/* .Bot */ .r(options);
@@ -8268,7 +8268,7 @@ Retry count: ${retryCount}
 
 /***/ }),
 
-/***/ 8870:
+/***/ 1846:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -8278,10 +8278,52 @@ __nccwpck_require__.d(__webpack_exports__, {
   "E": () => (/* binding */ Options)
 });
 
-// UNUSED EXPORTS: PathFilter
-
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
+;// CONCATENATED MODULE: ./lib/limits.js
+class TokenLimits {
+    maxTokens;
+    requestTokens;
+    responseTokens;
+    knowledgeCutOff;
+    constructor(model = 'gpt-3.5-turbo') {
+        this.knowledgeCutOff = '2023-10-01';
+        if (model === 'gpt-4-32k') {
+            this.maxTokens = 32600;
+            this.responseTokens = 4000;
+        }
+        else if (model === 'gpt-3.5-turbo-16k') {
+            this.maxTokens = 16300;
+            this.responseTokens = 3000;
+        }
+        else if (model === 'gpt-4') {
+            this.maxTokens = 8000;
+            this.responseTokens = 2000;
+        }
+        else if (model === 'gpt-4o') {
+            // gpt-4o has 128k token size but we set to 32k for now
+            this.maxTokens = 32600;
+            this.responseTokens = 4000;
+        }
+        else if (model === 'bedrock-claude3.5-sonnet') {
+            this.maxTokens = 16000;
+            this.responseTokens = 4000;
+        }
+        else {
+            this.maxTokens = 4000;
+            this.responseTokens = 1000;
+        }
+        // provide some margin for the request tokens
+        this.requestTokens = this.maxTokens - this.responseTokens - 100;
+    }
+    toString() {
+        return JSON.stringify(Object.fromEntries(Object.entries(this).map(([key, value]) => [
+            key,
+            typeof value === 'number' ? Math.round(value) : value
+        ])), null, 2);
+    }
+}
+
 // EXTERNAL MODULE: ./node_modules/brace-expansion/index.js
 var brace_expansion = __nccwpck_require__(3717);
 ;// CONCATENATED MODULE: ./node_modules/minimatch/dist/mjs/assert-valid-pattern.js
@@ -10043,110 +10085,8 @@ minimatch.Minimatch = Minimatch;
 minimatch.escape = escape_escape;
 minimatch.unescape = unescape_unescape;
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./lib/limits.js
-class TokenLimits {
-    maxTokens;
-    requestTokens;
-    responseTokens;
-    knowledgeCutOff;
-    constructor(model = 'gpt-3.5-turbo') {
-        this.knowledgeCutOff = '2023-10-01';
-        if (model === 'gpt-4-32k') {
-            this.maxTokens = 32600;
-            this.responseTokens = 4000;
-        }
-        else if (model === 'gpt-3.5-turbo-16k') {
-            this.maxTokens = 16300;
-            this.responseTokens = 3000;
-        }
-        else if (model === 'gpt-4') {
-            this.maxTokens = 8000;
-            this.responseTokens = 2000;
-        }
-        else if (model === 'gpt-4o') {
-            // gpt-4o has 128k token size but we set to 32k for now
-            this.maxTokens = 32600;
-            this.responseTokens = 4000;
-        }
-        else if (model === 'bedrock-claude3.5-sonnet') {
-            this.maxTokens = 16000;
-            this.responseTokens = 4000;
-        }
-        else {
-            this.maxTokens = 4000;
-            this.responseTokens = 1000;
-        }
-        // provide some margin for the request tokens
-        this.requestTokens = this.maxTokens - this.responseTokens - 100;
-    }
-    string() {
-        return `max_tokens=${this.maxTokens}, request_tokens=${this.requestTokens}, response_tokens=${this.responseTokens}`;
-    }
-}
+;// CONCATENATED MODULE: ./lib/pathFilter.js
 
-;// CONCATENATED MODULE: ./lib/options.js
-
-
-
-class Options {
-    debug;
-    disableReview;
-    disableReleaseNotes;
-    maxFiles;
-    reviewSimpleChanges;
-    reviewCommentLGTM;
-    pathFilters;
-    systemMessage;
-    model;
-    eragRetries;
-    eragConcurrencyLimit;
-    githubConcurrencyLimit;
-    tokenLimits;
-    eragBaseUrl;
-    eragProjectName;
-    constructor(debug, disableReview, disableReleaseNotes, maxFiles = '0', reviewSimpleChanges = false, reviewCommentLGTM = false, pathFilters = null, systemMessage = '', model = 'gpt-4o', eragRetries = '3', eragConcurrencyLimit = '6', githubConcurrencyLimit = '6', eragBaseUrl = 'https://erag.trilogy.com/api/v2', eragProjectName = '') {
-        this.debug = debug;
-        this.disableReview = disableReview;
-        this.disableReleaseNotes = disableReleaseNotes;
-        this.maxFiles = parseInt(maxFiles);
-        this.reviewSimpleChanges = reviewSimpleChanges;
-        this.reviewCommentLGTM = reviewCommentLGTM;
-        this.pathFilters = new PathFilter(pathFilters);
-        this.systemMessage = systemMessage;
-        this.model = model;
-        this.eragRetries = parseInt(eragRetries);
-        this.eragConcurrencyLimit = parseInt(eragConcurrencyLimit);
-        this.githubConcurrencyLimit = parseInt(githubConcurrencyLimit);
-        this.tokenLimits = new TokenLimits(model);
-        this.eragBaseUrl = eragBaseUrl;
-        this.eragProjectName = eragProjectName;
-    }
-    // print all options using core.info
-    print() {
-        (0,core.info)('Printing options\n\n');
-        (0,core.info)(`debug: ${this.debug}`);
-        (0,core.info)(`disable_review: ${this.disableReview}`);
-        (0,core.info)(`disable_release_notes: ${this.disableReleaseNotes}`);
-        (0,core.info)(`max_files: ${this.maxFiles}`);
-        (0,core.info)(`review_simple_changes: ${this.reviewSimpleChanges}`);
-        (0,core.info)(`review_comment_lgtm: ${this.reviewCommentLGTM}`);
-        (0,core.info)(`path_filters: ${this.pathFilters}`);
-        (0,core.info)(`system_message: ${this.systemMessage}`);
-        (0,core.info)(`model: ${this.model}`);
-        (0,core.info)(`erag_retries: ${this.eragRetries}`);
-        (0,core.info)(`erag_concurrency_limit: ${this.eragConcurrencyLimit}`);
-        (0,core.info)(`github_concurrency_limit: ${this.githubConcurrencyLimit}`);
-        (0,core.info)(`token_limits: ${this.tokenLimits.string()}`);
-        (0,core.info)(`erag_base_url: ${this.eragBaseUrl}`);
-        (0,core.info)(`erag_project_name: ${this.eragProjectName}`);
-        (0,core.info)('\n\n');
-    }
-    checkPath(path) {
-        const ok = this.pathFilters.check(path);
-        (0,core.info)(`checking path: ${path} => ${ok}`);
-        return ok;
-    }
-}
 class PathFilter {
     rules;
     constructor(rules = null) {
@@ -10187,6 +10127,57 @@ class PathFilter {
         }
         return (!inclusionRuleExists || included) && !excluded;
     }
+    toString() {
+        return this.rules
+            .map(([rule, exclude]) => (exclude ? `!${rule}` : rule))
+            .join(',');
+    }
+}
+
+;// CONCATENATED MODULE: ./lib/options.js
+
+
+
+class Options {
+    debug;
+    disableReview;
+    disableReleaseNotes;
+    maxFiles;
+    reviewSimpleChanges;
+    reviewCommentLGTM;
+    pathFilters;
+    systemMessage;
+    model;
+    eragRetries;
+    eragConcurrencyLimit;
+    githubConcurrencyLimit;
+    eragBaseUrl;
+    eragProjectName;
+    tokenLimits;
+    constructor() {
+        this.debug = (0,core.getBooleanInput)('debug');
+        this.disableReview = (0,core.getBooleanInput)('disable_review');
+        this.disableReleaseNotes = (0,core.getBooleanInput)('disable_release_notes');
+        this.maxFiles = parseInt((0,core.getInput)('max_files'));
+        this.reviewSimpleChanges = (0,core.getBooleanInput)('review_simple_changes');
+        this.reviewCommentLGTM = (0,core.getBooleanInput)('review_comment_lgtm');
+        this.pathFilters = new PathFilter((0,core.getMultilineInput)('path_filters'));
+        this.systemMessage = (0,core.getInput)('system_message');
+        this.model = (0,core.getInput)('model');
+        this.eragRetries = parseInt((0,core.getInput)('erag_retries'));
+        this.eragConcurrencyLimit = parseInt((0,core.getInput)('erag_concurrency_limit'));
+        this.githubConcurrencyLimit = parseInt((0,core.getInput)('github_concurrency_limit'));
+        this.eragBaseUrl = (0,core.getInput)('erag_base_url');
+        this.eragProjectName = (0,core.getInput)('erag_project_name');
+        this.tokenLimits = new TokenLimits(this.model);
+    }
+    toString() {
+        let result = 'Options:\n';
+        for (const [key, value] of Object.entries(this)) {
+            result += `${key}: ${value}\n`;
+        }
+        return result;
+    }
 }
 
 
@@ -10200,8 +10191,24 @@ class PathFilter {
 /* harmony export */   "j": () => (/* binding */ Prompts)
 /* harmony export */ });
 class Prompts {
-    summarize;
-    summarizeReleaseNotes;
+    summarize = `
+Provide your final response in markdown with the following content:
+
+- **Walkthrough**: A high-level summary of the overall change instead of 
+  specific files within 80 words.
+- **Changes**: A markdown table of files and their summaries. Group files 
+  with similar changes together into a single row to save space.
+
+Avoid additional commentary as this summary will be added as a comment on the 
+GitHub pull request. Use the titles "Walkthrough" and "Changes" and they must be H2.
+`;
+    summarizeReleaseNotes = `
+Craft concise release notes for the pull request. 
+Focus on the purpose and user impact, categorizing changes as "New Feature", "Bug Fix", 
+"Documentation", "Refactor", "Style", "Test", "Chore", or "Revert". Provide a bullet-point list, 
+e.g., "- New Feature: Added search functionality to the UI". Limit your response to 50-100 words 
+and emphasize features visible to the end-user while omitting code-level details.
+`;
     summarizeFileDiff = `## GitHub PR Title
 
 \`$title\` 
@@ -10244,7 +10251,7 @@ You must strictly follow the format below for triaging the diff:
 [TRIAGE]: <NEEDS_REVIEW or APPROVED>
 
 Important:
-- In your summary do not mention that the file needs a through review or caution about
+- In your summary do not mention that the file needs a thorough review or caution about
   potential issues.
 - Do not provide any reasoning why you triaged the diff as \`NEEDS_REVIEW\` or \`APPROVED\`.
 - Do not mention that these changes affect the logic or functionality of the code in 
@@ -10450,10 +10457,6 @@ $comment_chain
 $comment
 \`\`\`
 `;
-    constructor(summarize = '', summarizeReleaseNotes = '') {
-        this.summarize = summarize;
-        this.summarizeReleaseNotes = summarizeReleaseNotes;
-    }
     renderSummarizeFileDiff(inputs, reviewSimpleChanges) {
         let prompt = this.summarizeFileDiff;
         if (reviewSimpleChanges === false) {
@@ -10887,7 +10890,7 @@ const codeReview = async (reviewBot, options, prompts) => {
     const filterSelectedFiles = [];
     const filterIgnoredFiles = [];
     for (const file of files) {
-        if (!options.checkPath(file.filename)) {
+        if (!options.pathFilters.check(file.filename)) {
             (0,core.info)(`skip for excluded path: ${file.filename}`);
             filterIgnoredFiles.push(file);
         }

@@ -10154,6 +10154,10 @@ class Options {
     tokenLimits;
     constructor() {
         this.eragProjectName = (0,core.getInput)('erag_project_name');
+        // Need to enforce required inputs ourselves (See https://github.com/actions/runner/issues/1070)
+        if (!this.eragProjectName) {
+            throw new Error('erag_project_name is required');
+        }
         this.debug = (0,core.getBooleanInput)('debug');
         this.disableReview = (0,core.getBooleanInput)('disable_review');
         this.disableReleaseNotes = (0,core.getBooleanInput)('disable_release_notes');

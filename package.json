@@ -1,8 +1,8 @@
 {
-  "name": "openai-pr-reviewer",
+  "name": "erag-reviewer",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenAI-based PR Reviewer and Summarizer.",
+  "description": "Erag-based PR Reviewer and Summarizer.",
   "main": "lib/main.js",
   "scripts": {
     "build": "cp node_modules/@dqbd/tiktoken/tiktoken_bg.wasm dist/tiktoken_bg.wasm && tsc",

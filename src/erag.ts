@@ -19,30 +19,33 @@ export class EragAPI {
   }
 
   async sendMessage(query: string): Promise<string> {
-    const queryEndpoint = `${this.apiUrl}/ai/query`
-    const response = await axios.post(
-      queryEndpoint,
-      {
-        query,
-        model: this.model,
-        // eslint-disable-next-line camelcase
-        project_name: this.projectName
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`
+    try {
+      const queryEndpoint = `${this.apiUrl}/ai/query`
+      const response = await axios.post(
+        queryEndpoint,
+        {
+          query,
+          model: this.model,
+          // eslint-disable-next-line camelcase
+          project_name: this.projectName
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`
+          }
         }
-      }
-    )
+      )
 
-    if (response.data.error) {
-      if (response.data.error.includes('403')) {
+      if (response.data.error) {
+        throw new Error(response.data.error)
+      }
+
+      return response.data.response.text
+    } catch (error: any) {
+      if (error.response.status === 403) {
         throw new Error('Unauthorized: Please check your ERAG_ACCESS_TOKEN')
       }
-
-      throw new Error(response.data.error)
+      throw new Error(error)
     }
-
-    return response.data.response.text
   }
 }

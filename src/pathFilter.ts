@@ -47,6 +47,6 @@ export class PathFilter {
   toString(): string {
     return this.rules
       .map(([rule, exclude]) => (exclude ? `!${rule}` : rule))
-      .join(',')
+      .join('\n')
   }
 }

@@ -40,11 +40,12 @@ export class Options {
 
   toString(): string {
     let result = 'Options:\n'
+    const separator = `${'-'.repeat(20)}\n`
 
     for (const [key, value] of Object.entries(this)) {
-      result += `${key}: ${value}\n`
+      result += `${key}: ${value}\n${separator}`
     }
 
-    return result
+    return result.trimEnd()
   }
 }

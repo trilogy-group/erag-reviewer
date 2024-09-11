@@ -10130,7 +10130,7 @@ class PathFilter {
     toString() {
         return this.rules
             .map(([rule, exclude]) => (exclude ? `!${rule}` : rule))
-            .join(',');
+            .join('\n');
     }
 }
 
@@ -10173,10 +10173,11 @@ class Options {
     }
     toString() {
         let result = 'Options:\n';
+        const separator = `${'-'.repeat(20)}\n`;
         for (const [key, value] of Object.entries(this)) {
-            result += `${key}: ${value}\n`;
+            result += `${key}: ${value}\n${separator}`;
         }
-        return result;
+        return result.trimEnd();
     }
 }
 

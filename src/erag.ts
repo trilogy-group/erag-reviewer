@@ -19,26 +19,26 @@ export class EragAPI {
   }
 
   async sendMessage(query: string): Promise<string> {
-    try {
-      const queryEndpoint = `${this.apiUrl}/ai/query`
-      const response = await axios.post(
-        queryEndpoint,
-        {
-          query,
-          model: this.model,
-          // eslint-disable-next-line camelcase
-          project_name: this.projectName
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`
-          }
+    const queryEndpoint = `${this.apiUrl}/ai/query`
+    const response = await axios.post(
+      queryEndpoint,
+      {
+        query,
+        model: this.model,
+        // eslint-disable-next-line camelcase
+        project_name: this.projectName
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`
         }
-      )
+      }
+    )
 
-      return response.data.response.text
-    } catch (error: any) {
-      throw new Error(`Failed to query erag: ${error}`)
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
+
+    return response.data.response.text
   }
 }

@@ -7336,23 +7336,21 @@ class EragAPI {
         this.accessToken = accessToken;
     }
     async sendMessage(query) {
-        try {
-            const queryEndpoint = `${this.apiUrl}/ai/query`;
-            const response = await lib_axios.post(queryEndpoint, {
-                query,
-                model: this.model,
-                // eslint-disable-next-line camelcase
-                project_name: this.projectName
-            }, {
-                headers: {
-                    Authorization: `Bearer ${this.accessToken}`
-                }
-            });
-            return response.data.response.text;
+        const queryEndpoint = `${this.apiUrl}/ai/query`;
+        const response = await lib_axios.post(queryEndpoint, {
+            query,
+            model: this.model,
+            // eslint-disable-next-line camelcase
+            project_name: this.projectName
+        }, {
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`
+            }
+        });
+        if (response.data.error) {
+            throw new Error(response.data.error);
         }
-        catch (error) {
-            throw new Error(`Failed to query erag: ${error}`);
-        }
+        return response.data.response.text;
     }
 }
 

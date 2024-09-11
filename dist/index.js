@@ -7351,7 +7351,7 @@ class EragAPI {
             return response.data.response.text;
         }
         catch (error) {
-            throw new Error(`Failed to query erag: ${error.message}`);
+            throw new Error(`Failed to query erag: ${error}`);
         }
     }
 }

@@ -37,8 +37,8 @@ export class EragAPI {
       )
 
       return response.data.response.text
-    } catch (error) {
-      throw new Error(`Failed to query erag: ${(error as Error).message}`)
+    } catch (error: any) {
+      throw new Error(`Failed to query erag: ${error}`)
     }
   }
 }

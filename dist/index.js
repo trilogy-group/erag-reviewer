@@ -7348,6 +7348,9 @@ class EragAPI {
             }
         });
         if (response.data.error) {
+            if (response.data.error.includes('403')) {
+                throw new Error('Unauthorized: Please check your ERAG_ACCESS_TOKEN');
+            }
             throw new Error(response.data.error);
         }
         return response.data.response.text;

@@ -1,4 +1,5 @@
-import axios from 'axios'
+import {setFailed} from '@actions/core'
+import axios, {isAxiosError} from 'axios'
 
 export class EragAPI {
   private model: string
@@ -42,8 +43,8 @@ export class EragAPI {
 
       return response.data.response.text
     } catch (error: any) {
-      if (error.response.status === 403) {
-        throw new Error('Unauthorized: Please check your ERAG_ACCESS_TOKEN')
+      if (isAxiosError(error) && error.response?.status === 403) {
+        setFailed('Unauthorized: Please check your ERAG_ACCESS_TOKEN')
       }
       throw new Error(error)
     }

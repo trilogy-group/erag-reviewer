@@ -1,6 +1,9 @@
 name: 'AI-based PR Reviewer & Summarizer with Chat Capabilities'
 description: 'AI-based PR Reviewer & Summarizer with Chat Capabilities'
 inputs:
+  erag_project_name:
+    required: true
+    description: 'The project name to use when querying erag.'
   debug:
     required: false
     description: 'Enable debug mode'
@@ -186,10 +189,6 @@ inputs:
     required: false
     description: 'The url of the erag api interface.'
     default: 'https://erag.trilogy.com/api/v2'
-  erag_project_name:
-    required: false
-    description: 'The project name to use when querying erag.'
-    default: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

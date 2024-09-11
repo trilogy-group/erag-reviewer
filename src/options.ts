@@ -20,6 +20,7 @@ export class Options {
   tokenLimits: TokenLimits
 
   constructor() {
+    this.eragProjectName = getInput('erag_project_name')
     this.debug = getBooleanInput('debug')
     this.disableReview = getBooleanInput('disable_review')
     this.disableReleaseNotes = getBooleanInput('disable_release_notes')
@@ -33,7 +34,6 @@ export class Options {
     this.eragConcurrencyLimit = parseInt(getInput('erag_concurrency_limit'))
     this.githubConcurrencyLimit = parseInt(getInput('github_concurrency_limit'))
     this.eragBaseUrl = getInput('erag_base_url')
-    this.eragProjectName = getInput('erag_project_name')
 
     this.tokenLimits = new TokenLimits(this.model)
   }

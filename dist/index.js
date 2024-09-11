@@ -10153,6 +10153,7 @@ class Options {
     eragProjectName;
     tokenLimits;
     constructor() {
+        this.eragProjectName = (0,core.getInput)('erag_project_name');
         this.debug = (0,core.getBooleanInput)('debug');
         this.disableReview = (0,core.getBooleanInput)('disable_review');
         this.disableReleaseNotes = (0,core.getBooleanInput)('disable_release_notes');
@@ -10166,7 +10167,6 @@ class Options {
         this.eragConcurrencyLimit = parseInt((0,core.getInput)('erag_concurrency_limit'));
         this.githubConcurrencyLimit = parseInt((0,core.getInput)('github_concurrency_limit'));
         this.eragBaseUrl = (0,core.getInput)('erag_base_url');
-        this.eragProjectName = (0,core.getInput)('erag_project_name');
         this.tokenLimits = new TokenLimits(this.model);
     }
     toString() {

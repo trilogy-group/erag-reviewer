@@ -7351,7 +7351,6 @@ const {
 
 ;// CONCATENATED MODULE: ./lib/erag.js
 
-
 class EragAPI {
     model;
     projectName;
@@ -7383,7 +7382,7 @@ class EragAPI {
         }
         catch (error) {
             if (axios_isAxiosError(error) && error.response?.status === 403) {
-                (0,core.setFailed)('Unauthorized: Please check your ERAG_ACCESS_TOKEN');
+                throw new Error('Unauthorized: Please check your ERAG_ACCESS_TOKEN');
             }
             throw new Error(error);
         }
@@ -7440,8 +7439,8 @@ class Bot {
                 (0,core.info)(`Received response from erag:\n\n ${response}\n\n`);
             }
         }
-        catch (error) {
-            (0,core.info)(`Failed to send message to erag: ${error}`);
+        catch (err) {
+            (0,core.error)(`Failed to send message to erag: ${err}`);
         }
         const end = Date.now();
         (0,core.info)(`erag sendMessage (including retries) response time: ${end - start} ms`);

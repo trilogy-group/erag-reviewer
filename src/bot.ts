@@ -1,6 +1,6 @@
 import './fetch-polyfill'
 
-import {info, setFailed, warning} from '@actions/core'
+import {info, error, setFailed, warning} from '@actions/core'
 import pRetry from 'p-retry'
 import {Options} from './options'
 import {EragAPI} from './erag'
@@ -61,8 +61,8 @@ export class Bot {
       if (this.options.debug) {
         info(`Received response from erag:\n\n ${response}\n\n`)
       }
-    } catch (error: any) {
-      info(`Failed to send message to erag: ${error}`)
+    } catch (err: any) {
+      error(`Failed to send message to erag: ${err}`)
     }
     const end = Date.now()
     info(

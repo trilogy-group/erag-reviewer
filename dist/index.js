@@ -7406,8 +7406,8 @@ class Bot {
                 (0,core.info)(`Received response from erag:\n\n ${response}\n\n`);
             }
         }
-        catch (e) {
-            (0,core.info)(`Failed to send message to erag: ${e.message}, backtrace: ${e.stack}`);
+        catch (error) {
+            (0,core.info)(`Failed to send message to erag: ${error}`);
         }
         const end = Date.now();
         (0,core.info)(`erag sendMessage (including retries) response time: ${end - start} ms`);

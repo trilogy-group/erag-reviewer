@@ -61,10 +61,8 @@ export class Bot {
       if (this.options.debug) {
         info(`Received response from erag:\n\n ${response}\n\n`)
       }
-    } catch (e: any) {
-      info(
-        `Failed to send message to erag: ${e.message}, backtrace: ${e.stack}`
-      )
+    } catch (error: any) {
+      info(`Failed to send message to erag: ${error}`)
     }
     const end = Date.now()
     info(

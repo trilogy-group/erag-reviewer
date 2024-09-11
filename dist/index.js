@@ -8170,11 +8170,24 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 async function run() {
-    const options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E();
-    // print options
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(options.toString());
-    const prompts = new _prompts__WEBPACK_IMPORTED_MODULE_5__/* .Prompts */ .j();
-    let reviewBot = null;
+    let options;
+    let prompts;
+    let reviewBot;
+    try {
+        options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E();
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(options.toString());
+    }
+    catch (e) {
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`Failed to create options: ${e}, backtrace: ${e.stack}`);
+        return;
+    }
+    try {
+        prompts = new _prompts__WEBPACK_IMPORTED_MODULE_5__/* .Prompts */ .j();
+    }
+    catch (e) {
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`Failed to create prompts: ${e}, backtrace: ${e.stack}`);
+        return;
+    }
     try {
         reviewBot = new _bot__WEBPACK_IMPORTED_MODULE_1__/* .Bot */ .r(options);
     }
@@ -10153,11 +10166,7 @@ class Options {
     eragProjectName;
     tokenLimits;
     constructor() {
-        this.eragProjectName = (0,core.getInput)('erag_project_name');
-        // Need to enforce required inputs ourselves (See https://github.com/actions/runner/issues/1070)
-        if (!this.eragProjectName) {
-            throw new Error('erag_project_name is required');
-        }
+        this.eragProjectName = (0,core.getInput)('erag_project_name', { required: true });
         this.debug = (0,core.getBooleanInput)('debug');
         this.disableReview = (0,core.getBooleanInput)('disable_review');
         this.disableReleaseNotes = (0,core.getBooleanInput)('disable_release_notes');

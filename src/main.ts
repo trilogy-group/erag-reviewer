@@ -6,13 +6,25 @@ import {codeReview} from './review'
 import {handleReviewComment} from './review-comment'
 
 async function run(): Promise<void> {
-  const options: Options = new Options()
-  // print options
-  info(options.toString())
+  let options: Options
+  let prompts: Prompts
+  let reviewBot: Bot
 
-  const prompts: Prompts = new Prompts()
+  try {
+    options = new Options()
+    info(options.toString())
+  } catch (e: any) {
+    setFailed(`Failed to create options: ${e}, backtrace: ${e.stack}`)
+    return
+  }
 
-  let reviewBot: Bot | null = null
+  try {
+    prompts = new Prompts()
+  } catch (e: any) {
+    setFailed(`Failed to create prompts: ${e}, backtrace: ${e.stack}`)
+    return
+  }
+
   try {
     reviewBot = new Bot(options)
   } catch (e: any) {

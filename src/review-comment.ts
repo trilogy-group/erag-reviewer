@@ -26,6 +26,7 @@ export const handleReviewComment = async (
 ) => {
   const commenter: Commenter = new Commenter()
   const inputs: Inputs = new Inputs()
+  inputs.systemMessage = options.systemMessage
 
   if (context.eventName !== 'pull_request_review_comment') {
     warning(

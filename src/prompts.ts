@@ -1,6 +1,10 @@
 import {type Inputs} from './inputs'
 
 export class Prompts {
+  systemMessage = `$system_message
+
+`
+
   summarize = `
 Provide your final response in markdown with the following content:
 
@@ -278,7 +282,7 @@ $comment
     inputs: Inputs,
     reviewSimpleChanges: boolean
   ): string {
-    let prompt = this.summarizeFileDiff
+    let prompt = this.systemMessage + this.summarizeFileDiff
     if (reviewSimpleChanges === false) {
       prompt += this.triageFileDiff
     }
@@ -286,29 +290,34 @@ $comment
   }
 
   renderSummarizeChangesets(inputs: Inputs): string {
-    return inputs.render(this.summarizeChangesets)
+    const prompt = this.systemMessage + this.summarizeChangesets
+    return inputs.render(prompt)
   }
 
   renderSummarize(inputs: Inputs): string {
-    const prompt = this.summarizePrefix + this.summarize
+    const prompt = this.systemMessage + this.summarizePrefix + this.summarize
     return inputs.render(prompt)
   }
 
   renderSummarizeShort(inputs: Inputs): string {
-    const prompt = this.summarizePrefix + this.summarizeShort
+    const prompt =
+      this.systemMessage + this.summarizePrefix + this.summarizeShort
     return inputs.render(prompt)
   }
 
   renderSummarizeReleaseNotes(inputs: Inputs): string {
-    const prompt = this.summarizePrefix + this.summarizeReleaseNotes
+    const prompt =
+      this.systemMessage + this.summarizePrefix + this.summarizeReleaseNotes
     return inputs.render(prompt)
   }
 
   renderComment(inputs: Inputs): string {
-    return inputs.render(this.comment)
+    const prompt = this.systemMessage + this.comment
+    return inputs.render(prompt)
   }
 
   renderReviewFileDiff(inputs: Inputs): string {
-    return inputs.render(this.reviewFileDiff)
+    const prompt = this.systemMessage + this.reviewFileDiff
+    return inputs.render(prompt)
   }
 }

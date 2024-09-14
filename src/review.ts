@@ -49,6 +49,8 @@ export const codeReview = async (
   }
 
   const inputs: Inputs = new Inputs()
+  inputs.systemMessage = options.systemMessage
+
   inputs.title = context.payload.pull_request.title
   if (context.payload.pull_request.body != null) {
     inputs.description = commenter.getDescription(
@@ -61,9 +63,6 @@ export const codeReview = async (
     info('Skipped: description contains ignore_keyword')
     return
   }
-
-  // as gpt-3.5-turbo isn't paying attention to system message, add to inputs for now
-  inputs.systemMessage = options.systemMessage
 
   // get SUMMARIZE_TAG message
   const existingSummarizeCmt = await commenter.findCommentWithTag(

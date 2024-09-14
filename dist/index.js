@@ -10238,6 +10238,9 @@ class Options {
 /* harmony export */   "j": () => (/* binding */ Prompts)
 /* harmony export */ });
 class Prompts {
+    systemMessage = `$system_message
+
+`;
     summarize = `
 Provide your final response in markdown with the following content:
 
@@ -10505,32 +10508,35 @@ $comment
 \`\`\`
 `;
     renderSummarizeFileDiff(inputs, reviewSimpleChanges) {
-        let prompt = this.summarizeFileDiff;
+        let prompt = this.systemMessage + this.summarizeFileDiff;
         if (reviewSimpleChanges === false) {
             prompt += this.triageFileDiff;
         }
         return inputs.render(prompt);
     }
     renderSummarizeChangesets(inputs) {
-        return inputs.render(this.summarizeChangesets);
+        const prompt = this.systemMessage + this.summarizeChangesets;
+        return inputs.render(prompt);
     }
     renderSummarize(inputs) {
-        const prompt = this.summarizePrefix + this.summarize;
+        const prompt = this.systemMessage + this.summarizePrefix + this.summarize;
         return inputs.render(prompt);
     }
     renderSummarizeShort(inputs) {
-        const prompt = this.summarizePrefix + this.summarizeShort;
+        const prompt = this.systemMessage + this.summarizePrefix + this.summarizeShort;
         return inputs.render(prompt);
     }
     renderSummarizeReleaseNotes(inputs) {
-        const prompt = this.summarizePrefix + this.summarizeReleaseNotes;
+        const prompt = this.systemMessage + this.summarizePrefix + this.summarizeReleaseNotes;
         return inputs.render(prompt);
     }
     renderComment(inputs) {
-        return inputs.render(this.comment);
+        const prompt = this.systemMessage + this.comment;
+        return inputs.render(prompt);
     }
     renderReviewFileDiff(inputs) {
-        return inputs.render(this.reviewFileDiff);
+        const prompt = this.systemMessage + this.reviewFileDiff;
+        return inputs.render(prompt);
     }
 }
 
@@ -10566,6 +10572,7 @@ const ASK_BOT = '@askErag';
 const handleReviewComment = async (reviewBot, options, prompts) => {
     const commenter = new _commenter__WEBPACK_IMPORTED_MODULE_2__/* .Commenter */ .Es();
     const inputs = new _inputs__WEBPACK_IMPORTED_MODULE_5__/* .Inputs */ .k();
+    inputs.systemMessage = options.systemMessage;
     if (context.eventName !== 'pull_request_review_comment') {
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`Skipped: ${context.eventName} is not a pull_request_review_comment event`);
         return;
@@ -10872,6 +10879,7 @@ const codeReview = async (reviewBot, options, prompts) => {
         return;
     }
     const inputs = new lib_inputs/* Inputs */.k();
+    inputs.systemMessage = options.systemMessage;
     inputs.title = context.payload.pull_request.title;
     if (context.payload.pull_request.body != null) {
         inputs.description = commenter.getDescription(context.payload.pull_request.body);
@@ -10881,8 +10889,6 @@ const codeReview = async (reviewBot, options, prompts) => {
         (0,core.info)('Skipped: description contains ignore_keyword');
         return;
     }
-    // as gpt-3.5-turbo isn't paying attention to system message, add to inputs for now
-    inputs.systemMessage = options.systemMessage;
     // get SUMMARIZE_TAG message
     const existingSummarizeCmt = await commenter.findCommentWithTag(lib_commenter/* SUMMARIZE_TAG */.Rp, context.payload.pull_request.number);
     let existingCommitIdsBlock = '';

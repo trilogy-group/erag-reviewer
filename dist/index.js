@@ -11212,9 +11212,11 @@ ${summariesFailed.length > 0
         let lgtmCount = 0;
         let reviewCount = 0;
         const doReview = async (filename, fileContent, patches) => {
-            (0,core.info)(`reviewing ${filename}`);
-            (0,core.info)(`content: ${fileContent}`);
-            (0,core.info)(`patches: ${patches}`);
+            if (options.debug) {
+                (0,core.info)(`reviewing ${filename}`);
+                (0,core.info)(`fileContent: ${fileContent}`);
+                (0,core.info)(`patches: ${patches}`);
+            }
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;

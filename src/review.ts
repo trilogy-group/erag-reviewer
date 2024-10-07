@@ -510,9 +510,11 @@ ${
       fileContent: string,
       patches: Array<[number, number, string]>
     ): Promise<void> => {
-      info(`reviewing ${filename}`)
-      info(`content: ${fileContent}`)
-      info(`patches: ${patches}`)
+      if (options.debug) {
+        info(`reviewing ${filename}`)
+        info(`fileContent: ${fileContent}`)
+        info(`patches: ${patches}`)
+      }
       // make a copy of inputs
       const ins: Inputs = inputs.clone()
       ins.filename = filename

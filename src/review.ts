@@ -24,11 +24,11 @@ const repo = context.repo
 
 const ignoreKeyword = '@erag: ignore'
 
-export const codeReview = async (
+export async function codeReview(
   reviewBot: Bot,
   options: Options,
   prompts: Prompts
-): Promise<void> => {
+): Promise<void> {
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
@@ -732,7 +732,7 @@ ${
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
 }
 
-const splitPatch = (patch: string | null | undefined): string[] => {
+function splitPatch(patch: string | null | undefined): string[] {
   if (patch == null) {
     return []
   }
@@ -756,12 +756,10 @@ const splitPatch = (patch: string | null | undefined): string[] => {
   return result
 }
 
-const patchStartEndLine = (
-  patch: string
-): {
+function patchStartEndLine(patch: string): {
   oldHunk: {startLine: number; endLine: number}
   newHunk: {startLine: number; endLine: number}
-} | null => {
+} | null {
   const pattern = /(^@@ -(\d+),(\d+) \+(\d+),(\d+) @@)/gm
   const match = pattern.exec(patch)
   if (match != null) {
@@ -784,9 +782,7 @@ const patchStartEndLine = (
   }
 }
 
-const parsePatch = (
-  patch: string
-): {oldHunk: string; newHunk: string} | null => {
+function parsePatch(patch: string): {oldHunk: string; newHunk: string} | null {
   const hunkInfo = patchStartEndLine(patch)
   if (hunkInfo == null) {
     return null

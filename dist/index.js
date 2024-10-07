@@ -10865,7 +10865,7 @@ var tokenizer = __nccwpck_require__(652);
 const context = github.context;
 const repo = context.repo;
 const ignoreKeyword = '@erag: ignore';
-const codeReview = async (reviewBot, options, prompts) => {
+async function codeReview(reviewBot, options, prompts) {
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
     const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit);
@@ -11213,6 +11213,8 @@ ${summariesFailed.length > 0
         let reviewCount = 0;
         const doReview = async (filename, fileContent, patches) => {
             (0,core.info)(`reviewing ${filename}`);
+            (0,core.info)(`content: ${fileContent}`);
+            (0,core.info)(`patches: ${patches}`);
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;
@@ -11383,8 +11385,8 @@ ${reviewsSkipped.length > 0
     }
     // post the final summary comment
     await commenter.comment(`${summarizeComment}`, lib_commenter/* SUMMARIZE_TAG */.Rp, 'replace');
-};
-const splitPatch = (patch) => {
+}
+function splitPatch(patch) {
     if (patch == null) {
         return [];
     }
@@ -11405,8 +11407,8 @@ const splitPatch = (patch) => {
         result.push(patch.substring(last));
     }
     return result;
-};
-const patchStartEndLine = (patch) => {
+}
+function patchStartEndLine(patch) {
     const pattern = /(^@@ -(\d+),(\d+) \+(\d+),(\d+) @@)/gm;
     const match = pattern.exec(patch);
     if (match != null) {
@@ -11428,8 +11430,8 @@ const patchStartEndLine = (patch) => {
     else {
         return null;
     }
-};
-const parsePatch = (patch) => {
+}
+function parsePatch(patch) {
     const hunkInfo = patchStartEndLine(patch);
     if (hunkInfo == null) {
         return null;
@@ -11473,7 +11475,7 @@ const parsePatch = (patch) => {
         oldHunk: oldHunkLines.join('\n'),
         newHunk: newHunkLines.join('\n')
     };
-};
+}
 function parseReview(response, patches, debug = false) {
     const reviews = [];
     response = sanitizeResponse(response.trim());

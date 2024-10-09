@@ -6,12 +6,7 @@ export class EragAPI {
   private apiUrl: string
   private accessToken: string
 
-  constructor(
-    apiUrl: string,
-    model: string,
-    projectName: string,
-    accessToken: string
-  ) {
+  constructor(apiUrl: string, model: string, projectName: string, accessToken: string) {
     this.model = model
     this.projectName = projectName
     this.apiUrl = apiUrl

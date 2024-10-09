@@ -13,15 +13,9 @@ export class Bot {
   constructor(options: Options) {
     this.options = options
     if (process.env.ERAG_ACCESS_TOKEN) {
-      this.api = new EragAPI(
-        options.eragBaseUrl,
-        options.model,
-        options.eragProjectName,
-        process.env.ERAG_ACCESS_TOKEN
-      )
+      this.api = new EragAPI(options.eragBaseUrl, options.model, options.eragProjectName, process.env.ERAG_ACCESS_TOKEN)
     } else {
-      const err =
-        "Unable to initialize the ERAG API, 'ERAG_ACCESS_TOKEN' environment variable is not available"
+      const err = "Unable to initialize the ERAG API, 'ERAG_ACCESS_TOKEN' environment variable is not available"
       throw new Error(err)
     }
   }
@@ -65,9 +59,7 @@ export class Bot {
       error(`Failed to send message to erag: ${err}`)
     }
     const end = Date.now()
-    info(
-      `erag sendMessage (including retries) response time: ${end - start} ms`
-    )
+    info(`erag sendMessage (including retries) response time: ${end - start} ms`)
 
     return response
   }

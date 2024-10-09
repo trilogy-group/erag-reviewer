@@ -28,22 +28,15 @@ async function run(): Promise<void> {
   try {
     reviewBot = new Bot(options)
   } catch (e: any) {
-    setFailed(
-      `Failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`
-    )
+    setFailed(`Failed to create review bot, please check your erag service user credentials: ${e}, backtrace: ${e.stack}`)
     return
   }
 
   try {
     // check if the event is pull_request
-    if (
-      process.env.GITHUB_EVENT_NAME === 'pull_request' ||
-      process.env.GITHUB_EVENT_NAME === 'pull_request_target'
-    ) {
+    if (process.env.GITHUB_EVENT_NAME === 'pull_request' || process.env.GITHUB_EVENT_NAME === 'pull_request_target') {
       await codeReview(reviewBot, options, prompts)
-    } else if (
-      process.env.GITHUB_EVENT_NAME === 'pull_request_review_comment'
-    ) {
+    } else if (process.env.GITHUB_EVENT_NAME === 'pull_request_review_comment') {
       await handleReviewComment(reviewBot, options, prompts)
     } else {
       warning('Skipped: this action only works on push events or pull_request')

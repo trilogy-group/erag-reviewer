@@ -32,12 +32,7 @@ export class TokenLimits {
 
   toString(): string {
     return JSON.stringify(
-      Object.fromEntries(
-        Object.entries(this).map(([key, value]) => [
-          key,
-          typeof value === 'number' ? Math.round(value) : value
-        ])
-      ),
+      Object.fromEntries(Object.entries(this).map(([key, value]) => [key, typeof value === 'number' ? Math.round(value) : value])),
       null,
       2
     )

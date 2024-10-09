@@ -278,10 +278,7 @@ $comment
 \`\`\`
 `
 
-  renderSummarizeFileDiff(
-    inputs: Inputs,
-    reviewSimpleChanges: boolean
-  ): string {
+  renderSummarizeFileDiff(inputs: Inputs, reviewSimpleChanges: boolean): string {
     let prompt = this.systemMessage + this.summarizeFileDiff
     if (reviewSimpleChanges === false) {
       prompt += this.triageFileDiff
@@ -300,14 +297,12 @@ $comment
   }
 
   renderSummarizeShort(inputs: Inputs): string {
-    const prompt =
-      this.systemMessage + this.summarizePrefix + this.summarizeShort
+    const prompt = this.systemMessage + this.summarizePrefix + this.summarizeShort
     return inputs.render(prompt)
   }
 
   renderSummarizeReleaseNotes(inputs: Inputs): string {
-    const prompt =
-      this.systemMessage + this.summarizePrefix + this.summarizeReleaseNotes
+    const prompt = this.systemMessage + this.summarizePrefix + this.summarizeReleaseNotes
     return inputs.render(prompt)
   }
 

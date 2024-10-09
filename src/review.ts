@@ -43,41 +43,19 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
 
   const {existingSummarizeCmtBody, existingCommitIdsBlock} = await getExistingSummarizeComment(pullRequest, commenter, inputs)
 
-  const allCommitIds = await commenter.getAllCommitIds()
-  // find highest reviewed commit id
-  let highestReviewedCommitId = ''
-  if (existingCommitIdsBlock !== '') {
-    highestReviewedCommitId = commenter.getHighestReviewedCommitId(allCommitIds, commenter.getReviewedCommitIds(existingCommitIdsBlock))
-  }
+  const highestReviewedCommitId = await determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter)
 
-  if (highestReviewedCommitId === '' || highestReviewedCommitId === pullRequest.head.sha) {
-    info(`Will review from the base commit: ${pullRequest.base.sha as string}`)
-    highestReviewedCommitId = pullRequest.base.sha
-  } else {
-    info(`Will review from commit: ${highestReviewedCommitId}`)
-  }
-
-  // Fetch the diff between the highest reviewed commit and the latest commit of the PR branch
-  const incrementalDiff = await octokit.repos.compareCommits({
-    owner: repo.owner,
-    repo: repo.repo,
-    base: highestReviewedCommitId,
-    head: pullRequest.head.sha
-  })
-
-  // Fetch the diff between the target branch's base commit and the latest commit of the PR branch
-  const targetBranchDiff = await octokit.repos.compareCommits({
-    owner: repo.owner,
-    repo: repo.repo,
-    base: pullRequest.base.sha,
-    head: pullRequest.head.sha
-  })
-
-  const incrementalFiles = incrementalDiff.data.files
-  const targetBranchFiles = targetBranchDiff.data.files
+  // incrementalFiles are the files that are changed between the highest reviewed commit and the latest commit of the PR branch
+  // targetBranchFiles are the files that are changed between the base commit of the PR and the latest commit of the PR branch
+  const {incrementalFiles, targetBranchFiles, commits} = await fetchDiffs(highestReviewedCommitId, pullRequest)
 
   if (incrementalFiles == null || targetBranchFiles == null) {
     warning('Skipped: files data is missing')
+    return
+  }
+
+  if (commits.length === 0) {
+    warning('Skipped: commits is null')
     return
   }
 
@@ -105,13 +83,6 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
 
   if (filterSelectedFiles.length === 0) {
     warning('Skipped: filterSelectedFiles is null')
-    return
-  }
-
-  const commits = incrementalDiff.data.commits
-
-  if (commits.length === 0) {
-    warning('Skipped: commits is null')
     return
   }
 
@@ -565,6 +536,46 @@ ${
 
   // post the final summary comment
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
+}
+
+async function determineHighestReviewedCommitId(existingCommitIdsBlock: string, pullRequest: any, commenter: Commenter) {
+  const allCommitIds = await commenter.getAllCommitIds()
+  let highestReviewedCommitId = ''
+  if (existingCommitIdsBlock !== '') {
+    highestReviewedCommitId = commenter.getHighestReviewedCommitId(allCommitIds, commenter.getReviewedCommitIds(existingCommitIdsBlock))
+  }
+
+  if (highestReviewedCommitId === '' || highestReviewedCommitId === pullRequest.head.sha) {
+    info(`Will review from the base commit: ${pullRequest.base.sha as string}`)
+    highestReviewedCommitId = pullRequest.base.sha
+  } else {
+    info(`Will review from commit: ${highestReviewedCommitId}`)
+  }
+  return highestReviewedCommitId
+}
+
+async function fetchDiffs(highestReviewedCommitId: string, pullRequest: any) {
+  // Fetch the diff between the highest reviewed commit and the latest commit of the PR branch
+  const incrementalDiff = await octokit.repos.compareCommits({
+    owner: repo.owner,
+    repo: repo.repo,
+    base: highestReviewedCommitId,
+    head: pullRequest.head.sha
+  })
+
+  // Fetch the diff between the target branch's base commit and the latest commit of the PR branch
+  const targetBranchDiff = await octokit.repos.compareCommits({
+    owner: repo.owner,
+    repo: repo.repo,
+    base: pullRequest.base.sha,
+    head: pullRequest.head.sha
+  })
+
+  return {
+    incrementalFiles: incrementalDiff.data.files,
+    targetBranchFiles: targetBranchDiff.data.files,
+    commits: incrementalDiff.data.commits
+  }
 }
 
 async function getExistingSummarizeComment(pullRequest: any, commenter: Commenter, inputs: Inputs) {

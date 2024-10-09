@@ -39,15 +39,7 @@ export async function codeReview(
   }
   const pullRequest = context.payload.pull_request!
 
-  const inputs: Inputs = new Inputs()
-  inputs.systemMessage = options.systemMessage
-
-  inputs.title = pullRequest.title
-  if (pullRequest.body != null) {
-    inputs.description = commenter.getDescription(pullRequest.body)
-  }
-
-  // if the description contains ignore_keyword, skip
+  const inputs = initializeInputs(pullRequest, options, commenter)
   if (inputs.description.includes(ignoreKeyword)) {
     info('Skipped: description contains ignore_keyword')
     return
@@ -704,6 +696,20 @@ ${
 
   // post the final summary comment
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
+}
+
+function initializeInputs(
+  pullRequest: any,
+  options: Options,
+  commenter: Commenter
+): Inputs {
+  const inputs: Inputs = new Inputs()
+  inputs.systemMessage = options.systemMessage
+  inputs.title = pullRequest.title
+  if (pullRequest.body) {
+    inputs.description = commenter.getDescription(pullRequest.body)
+  }
+  return inputs
 }
 
 function isPullRequestEvent(): boolean {

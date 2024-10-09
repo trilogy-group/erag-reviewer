@@ -45,21 +45,8 @@ export async function codeReview(
     return
   }
 
-  // get SUMMARIZE_TAG message
-  const existingSummarizeCmt = await commenter.findCommentWithTag(
-    SUMMARIZE_TAG,
-    pullRequest.number
-  )
-  let existingCommitIdsBlock = ''
-  let existingSummarizeCmtBody = ''
-  if (existingSummarizeCmt != null) {
-    existingSummarizeCmtBody = existingSummarizeCmt.body
-    inputs.rawSummary = commenter.getRawSummary(existingSummarizeCmtBody)
-    inputs.shortSummary = commenter.getShortSummary(existingSummarizeCmtBody)
-    existingCommitIdsBlock = commenter.getReviewedCommitIdsBlock(
-      existingSummarizeCmtBody
-    )
-  }
+  const {existingSummarizeCmtBody, existingCommitIdsBlock} =
+    await getExistingSummarizeComment(pullRequest, commenter, inputs)
 
   const allCommitIds = await commenter.getAllCommitIds()
   // find highest reviewed commit id
@@ -696,6 +683,27 @@ ${
 
   // post the final summary comment
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
+}
+
+async function getExistingSummarizeComment(
+  pullRequest: any,
+  commenter: Commenter,
+  inputs: Inputs
+) {
+  const existingSummarizeCmt = await commenter.findCommentWithTag(
+    SUMMARIZE_TAG,
+    pullRequest.number
+  )
+  if (existingSummarizeCmt) {
+    const existingSummarizeCmtBody = existingSummarizeCmt.body
+    const existingCommitIdsBlock = commenter.getReviewedCommitIdsBlock(
+      existingSummarizeCmtBody
+    )
+    inputs.rawSummary = commenter.getRawSummary(existingSummarizeCmtBody)
+    inputs.shortSummary = commenter.getShortSummary(existingSummarizeCmtBody)
+    return {existingSummarizeCmtBody, existingCommitIdsBlock}
+  }
+  return {existingSummarizeCmtBody: '', existingCommitIdsBlock: ''}
 }
 
 function initializeInputs(

@@ -34,28 +34,17 @@ export async function codeReview(
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
   const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit)
 
-  if (
-    context.eventName !== 'pull_request' &&
-    context.eventName !== 'pull_request_target'
-  ) {
-    warning(
-      `Skipped: current event is ${context.eventName}, only support pull_request event`
-    )
+  if (!isPullRequestEvent()) {
     return
   }
-  if (context.payload.pull_request == null) {
-    warning('Skipped: context.payload.pull_request is null')
-    return
-  }
+  const pullRequest = context.payload.pull_request!
 
   const inputs: Inputs = new Inputs()
   inputs.systemMessage = options.systemMessage
 
-  inputs.title = context.payload.pull_request.title
-  if (context.payload.pull_request.body != null) {
-    inputs.description = commenter.getDescription(
-      context.payload.pull_request.body
-    )
+  inputs.title = pullRequest.title
+  if (pullRequest.body != null) {
+    inputs.description = commenter.getDescription(pullRequest.body)
   }
 
   // if the description contains ignore_keyword, skip
@@ -67,7 +56,7 @@ export async function codeReview(
   // get SUMMARIZE_TAG message
   const existingSummarizeCmt = await commenter.findCommentWithTag(
     SUMMARIZE_TAG,
-    context.payload.pull_request.number
+    pullRequest.number
   )
   let existingCommitIdsBlock = ''
   let existingSummarizeCmtBody = ''
@@ -92,14 +81,10 @@ export async function codeReview(
 
   if (
     highestReviewedCommitId === '' ||
-    highestReviewedCommitId === context.payload.pull_request.head.sha
+    highestReviewedCommitId === pullRequest.head.sha
   ) {
-    info(
-      `Will review from the base commit: ${
-        context.payload.pull_request.base.sha as string
-      }`
-    )
-    highestReviewedCommitId = context.payload.pull_request.base.sha
+    info(`Will review from the base commit: ${pullRequest.base.sha as string}`)
+    highestReviewedCommitId = pullRequest.base.sha
   } else {
     info(`Will review from commit: ${highestReviewedCommitId}`)
   }
@@ -109,15 +94,15 @@ export async function codeReview(
     owner: repo.owner,
     repo: repo.repo,
     base: highestReviewedCommitId,
-    head: context.payload.pull_request.head.sha
+    head: pullRequest.head.sha
   })
 
   // Fetch the diff between the target branch's base commit and the latest commit of the PR branch
   const targetBranchDiff = await octokit.repos.compareCommits({
     owner: repo.owner,
     repo: repo.repo,
-    base: context.payload.pull_request.base.sha,
-    head: context.payload.pull_request.head.sha
+    base: pullRequest.base.sha,
+    head: pullRequest.head.sha
   })
 
   const incrementalFiles = incrementalDiff.data.files
@@ -172,16 +157,12 @@ export async function codeReview(
       githubConcurrencyLimit(async () => {
         // retrieve file contents
         let fileContent = ''
-        if (context.payload.pull_request == null) {
-          warning('Skipped: context.payload.pull_request is null')
-          return null
-        }
         try {
           const contents = await octokit.repos.getContent({
             owner: repo.owner,
             repo: repo.repo,
             path: file.filename,
-            ref: context.payload.pull_request.base.sha
+            ref: pullRequest.base.sha
           })
           if (contents.data != null) {
             if (!Array.isArray(contents.data)) {
@@ -263,7 +244,7 @@ ${hunks.oldHunk}
   let statusMsg = `<details>
 <summary>Commits</summary>
 Files that changed from the base of the PR and between ${highestReviewedCommitId} and ${
-    context.payload.pull_request.head.sha
+    pullRequest.head.sha
   } commits.
 </details>
 ${
@@ -428,10 +409,7 @@ ${filename}: ${summary}
       let message = '### Summary by Erag Reviewer\n\n'
       message += releaseNotesResponse
       try {
-        await commenter.updateDescription(
-          context.payload.pull_request.number,
-          message
-        )
+        await commenter.updateDescription(pullRequest.number, message)
       } catch (e: any) {
         warning(`release notes: error from github: ${e.message as string}`)
       }
@@ -537,10 +515,6 @@ ${
 
       let patchesPacked = 0
       for (const [startLine, endLine, patch] of patches) {
-        if (context.payload.pull_request == null) {
-          warning('No pull request found, skipping.')
-          continue
-        }
         // see if we can pack more patches into this request
         if (patchesPacked >= patchesToPack) {
           info(
@@ -556,7 +530,7 @@ ${
         let commentChain = ''
         try {
           const allChains = await commenter.getCommentChainsWithinRange(
-            context.payload.pull_request.number,
+            pullRequest.number,
             filename,
             startLine,
             endLine,
@@ -620,10 +594,6 @@ ${commentChain}
                 review.comment.includes('looks good to me'))
             ) {
               lgtmCount += 1
-              continue
-            }
-            if (context.payload.pull_request == null) {
-              warning('No pull request found, skipping.')
               continue
             }
 
@@ -721,12 +691,12 @@ ${
     // add existing_comment_ids_block with latest head sha
     summarizeComment += `\n${commenter.addReviewedCommitId(
       existingCommitIdsBlock,
-      context.payload.pull_request.head.sha
+      pullRequest.head.sha
     )}`
 
     // post the review
     await commenter.submitReview(
-      context.payload.pull_request.number,
+      pullRequest.number,
       commits[commits.length - 1].sha,
       statusMsg
     )
@@ -734,6 +704,23 @@ ${
 
   // post the final summary comment
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
+}
+
+function isPullRequestEvent(): boolean {
+  if (
+    context.eventName !== 'pull_request' &&
+    context.eventName !== 'pull_request_target'
+  ) {
+    warning(
+      `Skipped: current event is ${context.eventName}, only support pull_request event`
+    )
+    return false
+  }
+  if (context.payload.pull_request == null) {
+    warning('Skipped: context.payload.pull_request is null')
+    return false
+  }
+  return true
 }
 
 function splitPatch(patch: string | null | undefined): string[] {

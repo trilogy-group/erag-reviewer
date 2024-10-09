@@ -45,42 +45,13 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
 
   const highestReviewedCommitId = await determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter)
 
-  // incrementalFiles are the files that are changed between the highest reviewed commit and the latest commit of the PR branch
-  // targetBranchFiles are the files that are changed between the base commit of the PR and the latest commit of the PR branch
-  const {incrementalFiles, targetBranchFiles, commits} = await fetchDiffs(highestReviewedCommitId, pullRequest)
-
-  if (incrementalFiles == null || targetBranchFiles == null) {
-    warning('Skipped: files data is missing')
-    return
-  }
-
-  if (commits.length === 0) {
-    warning('Skipped: commits is null')
-    return
-  }
-
-  // Filter out any file that is changed compared to the incremental changes
-  const files = targetBranchFiles.filter(targetBranchFile =>
-    incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename)
-  )
-
-  if (files.length === 0) {
+  const files = await fetchDiffFiles(highestReviewedCommitId, pullRequest)
+  if (!files) {
     warning('Skipped: files is null')
     return
   }
 
-  // skip files if they are filtered out
-  const filterSelectedFiles = []
-  const filterIgnoredFiles = []
-  for (const file of files) {
-    if (!options.pathFilters.check(file.filename)) {
-      info(`skip for excluded path: ${file.filename}`)
-      filterIgnoredFiles.push(file)
-    } else {
-      filterSelectedFiles.push(file)
-    }
-  }
-
+  const {filterSelectedFiles, filterIgnoredFiles} = filterFilesByPath(files, options)
   if (filterSelectedFiles.length === 0) {
     warning('Skipped: filterSelectedFiles is null')
     return
@@ -554,7 +525,7 @@ async function determineHighestReviewedCommitId(existingCommitIdsBlock: string, 
   return highestReviewedCommitId
 }
 
-async function fetchDiffs(highestReviewedCommitId: string, pullRequest: any) {
+async function fetchDiffFiles(highestReviewedCommitId: string, pullRequest: any) {
   // Fetch the diff between the highest reviewed commit and the latest commit of the PR branch
   const incrementalDiff = await octokit.repos.compareCommits({
     owner: repo.owner,
@@ -571,11 +542,32 @@ async function fetchDiffs(highestReviewedCommitId: string, pullRequest: any) {
     head: pullRequest.head.sha
   })
 
-  return {
-    incrementalFiles: incrementalDiff.data.files,
-    targetBranchFiles: targetBranchDiff.data.files,
-    commits: incrementalDiff.data.commits
+  const incrementalFiles = incrementalDiff.data.files
+  const targetBranchFiles = targetBranchDiff.data.files
+
+  if (!incrementalFiles || !targetBranchFiles) {
+    warning('Skipped: files data is missing')
+    return null
   }
+
+  // Get files that were changed in the last commit which are also changed compared to the PR base commit
+  return targetBranchFiles.filter(targetBranchFile =>
+    incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename)
+  )
+}
+
+function filterFilesByPath(files: any, options: Options) {
+  const filterSelectedFiles = []
+  const filterIgnoredFiles = []
+  for (const file of files) {
+    if (!options.pathFilters.check(file.filename)) {
+      info(`skip for excluded path: ${file.filename}`)
+      filterIgnoredFiles.push(file)
+    } else {
+      filterSelectedFiles.push(file)
+    }
+  }
+  return {filterSelectedFiles, filterIgnoredFiles}
 }
 
 async function getExistingSummarizeComment(pullRequest: any, commenter: Commenter, inputs: Inputs) {

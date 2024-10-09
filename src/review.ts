@@ -710,7 +710,7 @@ function initializeInputs(
   pullRequest: any,
   options: Options,
   commenter: Commenter
-): Inputs {
+) {
   const inputs: Inputs = new Inputs()
   inputs.systemMessage = options.systemMessage
   inputs.title = pullRequest.title

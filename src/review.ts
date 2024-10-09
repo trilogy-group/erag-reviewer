@@ -45,7 +45,7 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
 
   const highestReviewedCommitId = await determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter)
 
-  const files = await fetchDiffFiles(highestReviewedCommitId, pullRequest)
+  const {files, commits} = await fetchDiffFiles(highestReviewedCommitId, pullRequest)
   if (!files) {
     warning('Skipped: files is null')
     return
@@ -56,6 +56,8 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
     warning('Skipped: filterSelectedFiles is null')
     return
   }
+
+  info(`rmahfoud - filterSelectedFiles: ${filterSelectedFiles}`)
 
   // find hunks to review
   const filteredFiles: Array<[string, string, string, Array<[number, number, string]>] | null> = await Promise.all(
@@ -544,16 +546,19 @@ async function fetchDiffFiles(highestReviewedCommitId: string, pullRequest: any)
 
   const incrementalFiles = incrementalDiff.data.files
   const targetBranchFiles = targetBranchDiff.data.files
+  const commits = incrementalDiff.data.commits
 
-  if (!incrementalFiles || !targetBranchFiles) {
+  if (!incrementalFiles || !targetBranchFiles || !commits) {
     warning('Skipped: files data is missing')
-    return null
+    return {files: [], commits: []}
   }
 
   // Get files that were changed in the last commit which are also changed compared to the PR base commit
-  return targetBranchFiles.filter(targetBranchFile =>
+  const files = targetBranchFiles.filter(targetBranchFile =>
     incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename)
   )
+
+  return {files, commits}
 }
 
 function filterFilesByPath(files: any, options: Options) {

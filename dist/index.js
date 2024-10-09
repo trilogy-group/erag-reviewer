@@ -7802,18 +7802,14 @@ ${COMMENT_REPLY_TAG}
         const comments = await this.listReviewComments(pullNumber);
         return comments.filter((comment) => comment.path === path &&
             comment.body !== '' &&
-            ((comment.start_line !== undefined &&
-                comment.start_line >= startLine &&
-                comment.line <= endLine) ||
+            ((comment.start_line !== undefined && comment.start_line >= startLine && comment.line <= endLine) ||
                 (startLine === endLine && comment.line === endLine)));
     }
     async getCommentsAtRange(pullNumber, path, startLine, endLine) {
         const comments = await this.listReviewComments(pullNumber);
         return comments.filter((comment) => comment.path === path &&
             comment.body !== '' &&
-            ((comment.start_line !== undefined &&
-                comment.start_line === startLine &&
-                comment.line === endLine) ||
+            ((comment.start_line !== undefined && comment.start_line === startLine && comment.line === endLine) ||
                 (startLine === endLine && comment.line === endLine)));
     }
     async getCommentChainsWithinRange(pullNumber, path, startLine, endLine, tag = '') {
@@ -8091,8 +8087,7 @@ ${commentBody}`;
         // remove the in-progress status if the marker exists
         // otherwise do nothing
         if (start !== -1 && end !== -1) {
-            return (commentBody.substring(0, start) +
-                commentBody.substring(end + IN_PROGRESS_END_TAG.length));
+            return commentBody.substring(0, start) + commentBody.substring(end + IN_PROGRESS_END_TAG.length);
         }
         return commentBody;
     }
@@ -8232,8 +8227,7 @@ async function run() {
     }
     try {
         // check if the event is pull_request
-        if (process.env.GITHUB_EVENT_NAME === 'pull_request' ||
-            process.env.GITHUB_EVENT_NAME === 'pull_request_target') {
+        if (process.env.GITHUB_EVENT_NAME === 'pull_request' || process.env.GITHUB_EVENT_NAME === 'pull_request_target') {
             await (0,_review__WEBPACK_IMPORTED_MODULE_3__/* .codeReview */ .z)(reviewBot, options, prompts);
         }
         else if (process.env.GITHUB_EVENT_NAME === 'pull_request_review_comment') {
@@ -8302,8 +8296,7 @@ Retry count: ${retryCount}
         onSecondaryRateLimit: (retryAfter, options) => {
             (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`SecondaryRateLimit detected for request ${options.method} ${options.url} ; retry after ${retryAfter} seconds`);
             // if we are doing a POST method on /repos/{owner}/{repo}/pulls/{pull_number}/reviews then we shouldn't retry
-            if (options.method === 'POST' &&
-                options.url.match(/\/repos\/.*\/.*\/pulls\/.*\/reviews/)) {
+            if (options.method === 'POST' && options.url.match(/\/repos\/.*\/.*\/pulls\/.*\/reviews/)) {
                 return false;
             }
             return true;
@@ -8363,10 +8356,7 @@ class TokenLimits {
         this.requestTokens = this.maxTokens - this.responseTokens - 100;
     }
     toString() {
-        return JSON.stringify(Object.fromEntries(Object.entries(this).map(([key, value]) => [
-            key,
-            typeof value === 'number' ? Math.round(value) : value
-        ])), null, 2);
+        return JSON.stringify(Object.fromEntries(Object.entries(this).map(([key, value]) => [key, typeof value === 'number' ? Math.round(value) : value])), null, 2);
     }
 }
 
@@ -10174,9 +10164,7 @@ class PathFilter {
         return (!inclusionRuleExists || included) && !excluded;
     }
     toString() {
-        return this.rules
-            .map(([rule, exclude]) => (exclude ? `!${rule}` : rule))
-            .join('\n');
+        return this.rules.map(([rule, exclude]) => (exclude ? `!${rule}` : rule)).join('\n');
     }
 }
 
@@ -10586,8 +10574,7 @@ const handleReviewComment = async (reviewBot, options, prompts) => {
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`Skipped: ${context.eventName} event is missing comment`);
         return;
     }
-    if (context.payload.pull_request == null ||
-        context.payload.repository == null) {
+    if (context.payload.pull_request == null || context.payload.repository == null) {
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`Skipped: ${context.eventName} event is missing pull_request`);
         return;
     }
@@ -10601,8 +10588,7 @@ const handleReviewComment = async (reviewBot, options, prompts) => {
         return;
     }
     // Check if the comment is not from the bot itself
-    if (!comment.body.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_TAG */ .Rs) &&
-        !comment.body.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_REPLY_TAG */ .aD)) {
+    if (!comment.body.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_TAG */ .Rs) && !comment.body.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_REPLY_TAG */ .aD)) {
         const pullNumber = context.payload.pull_request.number;
         inputs.comment = `${comment.user.login}: ${comment.body}`;
         inputs.diff = comment.diff_hunk;
@@ -10614,9 +10600,7 @@ const handleReviewComment = async (reviewBot, options, prompts) => {
         }
         inputs.commentChain = commentChain;
         // check whether this chain contains replies from the bot
-        if (commentChain.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_TAG */ .Rs) ||
-            commentChain.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_REPLY_TAG */ .aD) ||
-            comment.body.includes(ASK_BOT)) {
+        if (commentChain.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_TAG */ .Rs) || commentChain.includes(_commenter__WEBPACK_IMPORTED_MODULE_2__/* .COMMENT_REPLY_TAG */ .aD) || comment.body.includes(ASK_BOT)) {
             let fileDiff = '';
             try {
                 // get diff for this file by comparing the base and head commits
@@ -10661,9 +10645,7 @@ const handleReviewComment = async (reviewBot, options, prompts) => {
                 // count occurrences of $file_diff in prompt
                 const fileDiffCount = prompts.comment.split('$file_diff').length - 1;
                 const fileDiffTokens = (0,_tokenizer__WEBPACK_IMPORTED_MODULE_4__/* .getTokenCount */ .V)(fileDiff);
-                if (fileDiffCount > 0 &&
-                    tokens + fileDiffTokens * fileDiffCount <=
-                        options.tokenLimits.requestTokens) {
+                if (fileDiffCount > 0 && tokens + fileDiffTokens * fileDiffCount <= options.tokenLimits.requestTokens) {
                     tokens += fileDiffTokens * fileDiffCount;
                     inputs.fileDiff = fileDiff;
                 }
@@ -10869,116 +10851,42 @@ async function codeReview(reviewBot, options, prompts) {
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
     const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit);
-    if (context.eventName !== 'pull_request' &&
-        context.eventName !== 'pull_request_target') {
-        (0,core.warning)(`Skipped: current event is ${context.eventName}, only support pull_request event`);
+    if (!isPullRequestEvent()) {
         return;
     }
-    if (context.payload.pull_request == null) {
-        (0,core.warning)('Skipped: context.payload.pull_request is null');
-        return;
-    }
-    const inputs = new lib_inputs/* Inputs */.k();
-    inputs.systemMessage = options.systemMessage;
-    inputs.title = context.payload.pull_request.title;
-    if (context.payload.pull_request.body != null) {
-        inputs.description = commenter.getDescription(context.payload.pull_request.body);
-    }
-    // if the description contains ignore_keyword, skip
+    const pullRequest = context.payload.pull_request;
+    const inputs = initializeInputs(pullRequest, options, commenter);
     if (inputs.description.includes(ignoreKeyword)) {
         (0,core.info)('Skipped: description contains ignore_keyword');
         return;
     }
-    // get SUMMARIZE_TAG message
-    const existingSummarizeCmt = await commenter.findCommentWithTag(lib_commenter/* SUMMARIZE_TAG */.Rp, context.payload.pull_request.number);
-    let existingCommitIdsBlock = '';
-    let existingSummarizeCmtBody = '';
-    if (existingSummarizeCmt != null) {
-        existingSummarizeCmtBody = existingSummarizeCmt.body;
-        inputs.rawSummary = commenter.getRawSummary(existingSummarizeCmtBody);
-        inputs.shortSummary = commenter.getShortSummary(existingSummarizeCmtBody);
-        existingCommitIdsBlock = commenter.getReviewedCommitIdsBlock(existingSummarizeCmtBody);
-    }
-    const allCommitIds = await commenter.getAllCommitIds();
-    // find highest reviewed commit id
-    let highestReviewedCommitId = '';
-    if (existingCommitIdsBlock !== '') {
-        highestReviewedCommitId = commenter.getHighestReviewedCommitId(allCommitIds, commenter.getReviewedCommitIds(existingCommitIdsBlock));
-    }
-    if (highestReviewedCommitId === '' ||
-        highestReviewedCommitId === context.payload.pull_request.head.sha) {
-        (0,core.info)(`Will review from the base commit: ${context.payload.pull_request.base.sha}`);
-        highestReviewedCommitId = context.payload.pull_request.base.sha;
-    }
-    else {
-        (0,core.info)(`Will review from commit: ${highestReviewedCommitId}`);
-    }
-    // Fetch the diff between the highest reviewed commit and the latest commit of the PR branch
-    const incrementalDiff = await octokit/* octokit.repos.compareCommits */.K.repos.compareCommits({
-        owner: repo.owner,
-        repo: repo.repo,
-        base: highestReviewedCommitId,
-        head: context.payload.pull_request.head.sha
-    });
-    // Fetch the diff between the target branch's base commit and the latest commit of the PR branch
-    const targetBranchDiff = await octokit/* octokit.repos.compareCommits */.K.repos.compareCommits({
-        owner: repo.owner,
-        repo: repo.repo,
-        base: context.payload.pull_request.base.sha,
-        head: context.payload.pull_request.head.sha
-    });
-    const incrementalFiles = incrementalDiff.data.files;
-    const targetBranchFiles = targetBranchDiff.data.files;
-    if (incrementalFiles == null || targetBranchFiles == null) {
-        (0,core.warning)('Skipped: files data is missing');
-        return;
-    }
-    // Filter out any file that is changed compared to the incremental changes
-    const files = targetBranchFiles.filter(targetBranchFile => incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename));
-    if (files.length === 0) {
+    const { existingSummarizeCmtBody, existingCommitIdsBlock } = await getExistingSummarizeComment(pullRequest, commenter, inputs);
+    const highestReviewedCommitId = await determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter);
+    const { files, commits } = await fetchDiffFiles(highestReviewedCommitId, pullRequest);
+    if (!files) {
         (0,core.warning)('Skipped: files is null');
         return;
     }
-    // skip files if they are filtered out
-    const filterSelectedFiles = [];
-    const filterIgnoredFiles = [];
-    for (const file of files) {
-        if (!options.pathFilters.check(file.filename)) {
-            (0,core.info)(`skip for excluded path: ${file.filename}`);
-            filterIgnoredFiles.push(file);
-        }
-        else {
-            filterSelectedFiles.push(file);
-        }
-    }
+    const { filterSelectedFiles, filterIgnoredFiles } = filterFilesByPath(files, options);
     if (filterSelectedFiles.length === 0) {
         (0,core.warning)('Skipped: filterSelectedFiles is null');
         return;
     }
-    const commits = incrementalDiff.data.commits;
-    if (commits.length === 0) {
-        (0,core.warning)('Skipped: commits is null');
-        return;
-    }
+    (0,core.info)(`rmahfoud - filterSelectedFiles: ${filterSelectedFiles}`);
     // find hunks to review
     const filteredFiles = await Promise.all(filterSelectedFiles.map(file => githubConcurrencyLimit(async () => {
         // retrieve file contents
         let fileContent = '';
-        if (context.payload.pull_request == null) {
-            (0,core.warning)('Skipped: context.payload.pull_request is null');
-            return null;
-        }
         try {
             const contents = await octokit/* octokit.repos.getContent */.K.repos.getContent({
                 owner: repo.owner,
                 repo: repo.repo,
                 path: file.filename,
-                ref: context.payload.pull_request.base.sha
+                ref: pullRequest.base.sha
             });
             if (contents.data != null) {
                 if (!Array.isArray(contents.data)) {
-                    if (contents.data.type === 'file' &&
-                        contents.data.content != null) {
+                    if (contents.data.type === 'file' && contents.data.content != null) {
                         fileContent = Buffer.from(contents.data.content, 'base64').toString();
                     }
                 }
@@ -11012,11 +10920,7 @@ ${hunks.newHunk}
 ${hunks.oldHunk}
 \`\`\`
 `;
-            patches.push([
-                patchLines.newHunk.startLine,
-                patchLines.newHunk.endLine,
-                hunksStr
-            ]);
+            patches.push([patchLines.newHunk.startLine, patchLines.newHunk.endLine, hunksStr]);
         }
         if (patches.length > 0) {
             return [file.filename, fileContent, fileDiff, patches];
@@ -11033,16 +10937,14 @@ ${hunks.oldHunk}
     }
     let statusMsg = `<details>
 <summary>Commits</summary>
-Files that changed from the base of the PR and between ${highestReviewedCommitId} and ${context.payload.pull_request.head.sha} commits.
+Files that changed from the base of the PR and between ${highestReviewedCommitId} and ${pullRequest.head.sha} commits.
 </details>
 ${filesAndChanges.length > 0
         ? `
 <details>
 <summary>Files selected (${filesAndChanges.length})</summary>
 
-* ${filesAndChanges
-            .map(([filename, , , patches]) => `${filename} (${patches.length})`)
-            .join('\n* ')}
+* ${filesAndChanges.map(([filename, , , patches]) => `${filename} (${patches.length})`).join('\n* ')}
 </details>
 `
         : ''}
@@ -11160,7 +11062,7 @@ ${filename}: ${summary}
             let message = '### Summary by Erag Reviewer\n\n';
             message += releaseNotesResponse;
             try {
-                await commenter.updateDescription(context.payload.pull_request.number, message);
+                await commenter.updateDescription(pullRequest.number, message);
             }
             catch (e) {
                 (0,core.warning)(`release notes: error from github: ${e.message}`);
@@ -11235,10 +11137,6 @@ ${summariesFailed.length > 0
             }
             let patchesPacked = 0;
             for (const [startLine, endLine, patch] of patches) {
-                if (context.payload.pull_request == null) {
-                    (0,core.warning)('No pull request found, skipping.');
-                    continue;
-                }
                 // see if we can pack more patches into this request
                 if (patchesPacked >= patchesToPack) {
                     (0,core.info)(`unable to pack more patches into this request, packed: ${patchesPacked}, total patches: ${patches.length}, skipping.`);
@@ -11250,7 +11148,7 @@ ${summariesFailed.length > 0
                 patchesPacked += 1;
                 let commentChain = '';
                 try {
-                    const allChains = await commenter.getCommentChainsWithinRange(context.payload.pull_request.number, filename, startLine, endLine, lib_commenter/* COMMENT_REPLY_TAG */.aD);
+                    const allChains = await commenter.getCommentChainsWithinRange(pullRequest.number, filename, startLine, endLine, lib_commenter/* COMMENT_REPLY_TAG */.aD);
                     if (allChains.length > 0) {
                         (0,core.info)(`Found comment chains: ${allChains} for ${filename}`);
                         commentChain = allChains;
@@ -11295,14 +11193,8 @@ ${commentChain}
                     const reviews = parseReview(response, patches, options.debug);
                     for (const review of reviews) {
                         // check for LGTM
-                        if (!options.reviewCommentLGTM &&
-                            (review.comment.includes('LGTM') ||
-                                review.comment.includes('looks good to me'))) {
+                        if (!options.reviewCommentLGTM && (review.comment.includes('LGTM') || review.comment.includes('looks good to me'))) {
                             lgtmCount += 1;
-                            continue;
-                        }
-                        if (context.payload.pull_request == null) {
-                            (0,core.warning)('No pull request found, skipping.');
                             continue;
                         }
                         try {
@@ -11381,12 +11273,98 @@ ${reviewsSkipped.length > 0
 </details>
 `;
         // add existing_comment_ids_block with latest head sha
-        summarizeComment += `\n${commenter.addReviewedCommitId(existingCommitIdsBlock, context.payload.pull_request.head.sha)}`;
+        summarizeComment += `\n${commenter.addReviewedCommitId(existingCommitIdsBlock, pullRequest.head.sha)}`;
         // post the review
-        await commenter.submitReview(context.payload.pull_request.number, commits[commits.length - 1].sha, statusMsg);
+        await commenter.submitReview(pullRequest.number, commits[commits.length - 1].sha, statusMsg);
     }
     // post the final summary comment
     await commenter.comment(`${summarizeComment}`, lib_commenter/* SUMMARIZE_TAG */.Rp, 'replace');
+}
+async function determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter) {
+    const allCommitIds = await commenter.getAllCommitIds();
+    let highestReviewedCommitId = '';
+    if (existingCommitIdsBlock !== '') {
+        highestReviewedCommitId = commenter.getHighestReviewedCommitId(allCommitIds, commenter.getReviewedCommitIds(existingCommitIdsBlock));
+    }
+    if (highestReviewedCommitId === '' || highestReviewedCommitId === pullRequest.head.sha) {
+        (0,core.info)(`Will review from the base commit: ${pullRequest.base.sha}`);
+        highestReviewedCommitId = pullRequest.base.sha;
+    }
+    else {
+        (0,core.info)(`Will review from commit: ${highestReviewedCommitId}`);
+    }
+    return highestReviewedCommitId;
+}
+async function fetchDiffFiles(highestReviewedCommitId, pullRequest) {
+    // Fetch the diff between the highest reviewed commit and the latest commit of the PR branch
+    const incrementalDiff = await octokit/* octokit.repos.compareCommits */.K.repos.compareCommits({
+        owner: repo.owner,
+        repo: repo.repo,
+        base: highestReviewedCommitId,
+        head: pullRequest.head.sha
+    });
+    // Fetch the diff between the target branch's base commit and the latest commit of the PR branch
+    const targetBranchDiff = await octokit/* octokit.repos.compareCommits */.K.repos.compareCommits({
+        owner: repo.owner,
+        repo: repo.repo,
+        base: pullRequest.base.sha,
+        head: pullRequest.head.sha
+    });
+    const incrementalFiles = incrementalDiff.data.files;
+    const targetBranchFiles = targetBranchDiff.data.files;
+    const commits = incrementalDiff.data.commits;
+    if (!incrementalFiles || !targetBranchFiles || !commits) {
+        (0,core.warning)('Skipped: files data is missing');
+        return { files: [], commits: [] };
+    }
+    // Get files that were changed in the last commit which are also changed compared to the PR base commit
+    const files = targetBranchFiles.filter(targetBranchFile => incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename));
+    return { files, commits };
+}
+function filterFilesByPath(files, options) {
+    const filterSelectedFiles = [];
+    const filterIgnoredFiles = [];
+    for (const file of files) {
+        if (!options.pathFilters.check(file.filename)) {
+            (0,core.info)(`skip for excluded path: ${file.filename}`);
+            filterIgnoredFiles.push(file);
+        }
+        else {
+            filterSelectedFiles.push(file);
+        }
+    }
+    return { filterSelectedFiles, filterIgnoredFiles };
+}
+async function getExistingSummarizeComment(pullRequest, commenter, inputs) {
+    const existingSummarizeCmt = await commenter.findCommentWithTag(lib_commenter/* SUMMARIZE_TAG */.Rp, pullRequest.number);
+    if (existingSummarizeCmt) {
+        const existingSummarizeCmtBody = existingSummarizeCmt.body;
+        const existingCommitIdsBlock = commenter.getReviewedCommitIdsBlock(existingSummarizeCmtBody);
+        inputs.rawSummary = commenter.getRawSummary(existingSummarizeCmtBody);
+        inputs.shortSummary = commenter.getShortSummary(existingSummarizeCmtBody);
+        return { existingSummarizeCmtBody, existingCommitIdsBlock };
+    }
+    return { existingSummarizeCmtBody: '', existingCommitIdsBlock: '' };
+}
+function initializeInputs(pullRequest, options, commenter) {
+    const inputs = new lib_inputs/* Inputs */.k();
+    inputs.systemMessage = options.systemMessage;
+    inputs.title = pullRequest.title;
+    if (pullRequest.body) {
+        inputs.description = commenter.getDescription(pullRequest.body);
+    }
+    return inputs;
+}
+function isPullRequestEvent() {
+    if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
+        (0,core.warning)(`Skipped: current event is ${context.eventName}, only support pull_request event`);
+        return false;
+    }
+    if (context.payload.pull_request == null) {
+        (0,core.warning)('Skipped: context.payload.pull_request is null');
+        return false;
+    }
+    return true;
 }
 function splitPatch(patch) {
     if (patch == null) {
@@ -11463,8 +11441,7 @@ function parsePatch(patch) {
         else {
             // context line
             oldHunkLines.push(`${line}`);
-            if (removalOnly ||
-                (currentLine > skipStart && currentLine <= lines.length - skipEnd)) {
+            if (removalOnly || (currentLine > skipStart && currentLine <= lines.length - skipEnd)) {
                 newHunkLines.push(`${newLine}: ${line}`);
             }
             else {
@@ -11506,8 +11483,7 @@ function parseReview(response, patches, debug = false) {
                     maxIntersection = intersectionLength;
                     bestPatchStartLine = startLine;
                     bestPatchEndLine = endLine;
-                    withinPatch =
-                        intersectionLength === review.endLine - review.startLine + 1;
+                    withinPatch = intersectionLength === review.endLine - review.startLine + 1;
                 }
                 if (withinPatch)
                     break;
@@ -11543,14 +11519,8 @@ ${review.comment}`;
                 break;
             const codeBlock = comment.substring(codeBlockStartIndex + codeBlockStart.length, codeBlockEndIndex);
             const sanitizedBlock = codeBlock.replace(lineNumberRegex, '');
-            comment =
-                comment.slice(0, codeBlockStartIndex + codeBlockStart.length) +
-                    sanitizedBlock +
-                    comment.slice(codeBlockEndIndex);
-            codeBlockStartIndex = comment.indexOf(codeBlockStart, codeBlockStartIndex +
-                codeBlockStart.length +
-                sanitizedBlock.length +
-                codeBlockEnd.length);
+            comment = comment.slice(0, codeBlockStartIndex + codeBlockStart.length) + sanitizedBlock + comment.slice(codeBlockEndIndex);
+            codeBlockStartIndex = comment.indexOf(codeBlockStart, codeBlockStartIndex + codeBlockStart.length + sanitizedBlock.length + codeBlockEnd.length);
         }
         return comment;
     }

@@ -10267,6 +10267,12 @@ to the signatures of exported functions, global data structures and
 variables, and any changes that might affect the external interface or 
 behavior of the code.
 
+Additionally, please provide an array of symbols (e.g., function names, variable names) 
+that were changed in the diff. This array will be used to search for occurrences 
+of these symbols in the codebase. The array can be empty if no relevant symbols were changed. 
+You must strictly follow the format below for the array:
+SYMBOLS: ["symbol1", "symbol2", ...]
+
 Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
 \`APPROVED\` based on the following criteria:
 
@@ -10928,17 +10934,31 @@ ${filterIgnoredFiles.length > 0
                 // parse the comment to look for triage classification
                 // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
                 // if the change needs review return true, else false
+                let needsReview = false;
+                let summary = summarizeResp;
+                let symbols = [];
                 const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/;
                 const triageMatch = summarizeResp.match(triageRegex);
                 if (triageMatch != null) {
                     const triage = triageMatch[1];
-                    const needsReview = triage === 'NEEDS_REVIEW';
+                    needsReview = triage === 'NEEDS_REVIEW';
                     // remove this line from the comment
-                    const summary = summarizeResp.replace(triageRegex, '').trim();
+                    summary = summarizeResp.replace(triageRegex, '').trim();
                     (0,core.info)(`filename: ${filename}, triage: ${triage}`);
-                    return [filename, summary, needsReview];
                 }
-                return [filename, summarizeResp, true];
+                // Symbols to search for in the codebase to give more context to the LLM
+                const symbolsRegex = /SYMBOLS:\s*(\[.*?\])/;
+                const symbolsMatch = summarizeResp.match(symbolsRegex);
+                if (symbolsMatch != null) {
+                    const symbolsStr = symbolsMatch[1];
+                    symbols = symbolsStr
+                        .replace('[', '')
+                        .replace(']', '')
+                        .split(',')
+                        .map(symbol => symbol.trim());
+                    (0,core.info)(`filename: ${filename}, symbols: ${symbols}`);
+                }
+                return [filename, summary, needsReview, symbols];
             }
         }
         catch (e) {

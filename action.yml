@@ -22,10 +22,6 @@ inputs:
       'Max files to summarize and review. Less than or equal to 0 means no
       limit.'
     default: '150'
-  review_simple_changes:
-    required: false
-    description: 'Review even when the changes are simple'
-    default: 'false'
   path_filters:
     required: false
     description: |

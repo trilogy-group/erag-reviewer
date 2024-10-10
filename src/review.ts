@@ -112,7 +112,7 @@ ${
     ins.fileDiff = fileDiff
 
     // render prompt based on inputs so far
-    const summarizePrompt = prompts.renderSummarizeFileDiff(ins, options.reviewSimpleChanges)
+    const summarizePrompt = prompts.renderSummarizeFileDiff(ins)
     const tokens = getTokenCount(summarizePrompt)
 
     if (tokens > options.tokenLimits.requestTokens) {
@@ -130,22 +130,20 @@ ${
         summariesFailed.push(`${filename} (nothing obtained from erag)`)
         return null
       } else {
-        if (options.reviewSimpleChanges === false) {
-          // parse the comment to look for triage classification
-          // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
-          // if the change needs review return true, else false
-          const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/
-          const triageMatch = summarizeResp.match(triageRegex)
+        // parse the comment to look for triage classification
+        // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
+        // if the change needs review return true, else false
+        const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/
+        const triageMatch = summarizeResp.match(triageRegex)
 
-          if (triageMatch != null) {
-            const triage = triageMatch[1]
-            const needsReview = triage === 'NEEDS_REVIEW'
+        if (triageMatch != null) {
+          const triage = triageMatch[1]
+          const needsReview = triage === 'NEEDS_REVIEW'
 
-            // remove this line from the comment
-            const summary = summarizeResp.replace(triageRegex, '').trim()
-            info(`filename: ${filename}, triage: ${triage}`)
-            return [filename, summary, needsReview]
-          }
+          // remove this line from the comment
+          const summary = summarizeResp.replace(triageRegex, '').trim()
+          info(`filename: ${filename}, triage: ${triage}`)
+          return [filename, summary, needsReview]
         }
         return [filename, summarizeResp, true]
       }

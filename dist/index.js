@@ -10177,8 +10177,6 @@ class Options {
     disableReview;
     disableReleaseNotes;
     maxFiles;
-    reviewSimpleChanges;
-    reviewCommentLGTM;
     pathFilters;
     systemMessage;
     model;
@@ -10194,8 +10192,6 @@ class Options {
         this.disableReview = (0,core.getBooleanInput)('disable_review');
         this.disableReleaseNotes = (0,core.getBooleanInput)('disable_release_notes');
         this.maxFiles = parseInt((0,core.getInput)('max_files'));
-        this.reviewSimpleChanges = (0,core.getBooleanInput)('review_simple_changes');
-        this.reviewCommentLGTM = (0,core.getBooleanInput)('review_comment_lgtm');
         this.pathFilters = new PathFilter((0,core.getMultilineInput)('path_filters'));
         this.systemMessage = (0,core.getInput)('system_message');
         this.model = (0,core.getInput)('model');
@@ -10270,8 +10266,8 @@ If applicable, your summary should include a note about alterations
 to the signatures of exported functions, global data structures and 
 variables, and any changes that might affect the external interface or 
 behavior of the code.
-`;
-    triageFileDiff = `Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
+
+Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
 \`APPROVED\` based on the following criteria:
 
 - If the diff involves any modifications to the logic or functionality, even if they 
@@ -10495,11 +10491,8 @@ $comment_chain
 $comment
 \`\`\`
 `;
-    renderSummarizeFileDiff(inputs, reviewSimpleChanges) {
-        let prompt = this.systemMessage + this.summarizeFileDiff;
-        if (reviewSimpleChanges === false) {
-            prompt += this.triageFileDiff;
-        }
+    renderSummarizeFileDiff(inputs) {
+        const prompt = this.systemMessage + this.summarizeFileDiff;
         return inputs.render(prompt);
     }
     renderSummarizeChangesets(inputs) {
@@ -10850,7 +10843,6 @@ const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
-    const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit);
     if (!isPullRequestEvent()) {
         return;
     }
@@ -10872,65 +10864,7 @@ async function codeReview(reviewBot, options, prompts) {
         (0,core.warning)('Skipped: filterSelectedFiles is null');
         return;
     }
-    (0,core.info)(`rmahfoud - filterSelectedFiles: ${filterSelectedFiles}`);
-    // find hunks to review
-    const filteredFiles = await Promise.all(filterSelectedFiles.map(file => githubConcurrencyLimit(async () => {
-        // retrieve file contents
-        let fileContent = '';
-        try {
-            const contents = await octokit/* octokit.repos.getContent */.K.repos.getContent({
-                owner: repo.owner,
-                repo: repo.repo,
-                path: file.filename,
-                ref: pullRequest.base.sha
-            });
-            if (contents.data != null) {
-                if (!Array.isArray(contents.data)) {
-                    if (contents.data.type === 'file' && contents.data.content != null) {
-                        fileContent = Buffer.from(contents.data.content, 'base64').toString();
-                    }
-                }
-            }
-        }
-        catch (e) {
-            (0,core.warning)(`Failed to get file contents: ${e}. This is OK if it's a new file.`);
-        }
-        let fileDiff = '';
-        if (file.patch != null) {
-            fileDiff = file.patch;
-        }
-        const patches = [];
-        for (const patch of splitPatch(file.patch)) {
-            const patchLines = patchStartEndLine(patch);
-            if (patchLines == null) {
-                continue;
-            }
-            const hunks = parsePatch(patch);
-            if (hunks == null) {
-                continue;
-            }
-            const hunksStr = `
----new_hunk---
-\`\`\`
-${hunks.newHunk}
-\`\`\`
-
----old_hunk---
-\`\`\`
-${hunks.oldHunk}
-\`\`\`
-`;
-            patches.push([patchLines.newHunk.startLine, patchLines.newHunk.endLine, hunksStr]);
-        }
-        if (patches.length > 0) {
-            return [file.filename, fileContent, fileDiff, patches];
-        }
-        else {
-            return null;
-        }
-    })));
-    // Filter out any null results
-    const filesAndChanges = filteredFiles.filter(file => file !== null);
+    const filesAndChanges = await getFilesAndChanges(filterSelectedFiles, pullRequest, options);
     if (filesAndChanges.length === 0) {
         (0,core.error)('Skipped: no files to review');
         return;
@@ -10975,7 +10909,7 @@ ${filterIgnoredFiles.length > 0
         ins.filename = filename;
         ins.fileDiff = fileDiff;
         // render prompt based on inputs so far
-        const summarizePrompt = prompts.renderSummarizeFileDiff(ins, options.reviewSimpleChanges);
+        const summarizePrompt = prompts.renderSummarizeFileDiff(ins);
         const tokens = (0,tokenizer/* getTokenCount */.V)(summarizePrompt);
         if (tokens > options.tokenLimits.requestTokens) {
             (0,core.info)(`summarize: diff tokens exceeds limit, skip ${filename}`);
@@ -10991,20 +10925,18 @@ ${filterIgnoredFiles.length > 0
                 return null;
             }
             else {
-                if (options.reviewSimpleChanges === false) {
-                    // parse the comment to look for triage classification
-                    // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
-                    // if the change needs review return true, else false
-                    const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/;
-                    const triageMatch = summarizeResp.match(triageRegex);
-                    if (triageMatch != null) {
-                        const triage = triageMatch[1];
-                        const needsReview = triage === 'NEEDS_REVIEW';
-                        // remove this line from the comment
-                        const summary = summarizeResp.replace(triageRegex, '').trim();
-                        (0,core.info)(`filename: ${filename}, triage: ${triage}`);
-                        return [filename, summary, needsReview];
-                    }
+                // parse the comment to look for triage classification
+                // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
+                // if the change needs review return true, else false
+                const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/;
+                const triageMatch = summarizeResp.match(triageRegex);
+                if (triageMatch != null) {
+                    const triage = triageMatch[1];
+                    const needsReview = triage === 'NEEDS_REVIEW';
+                    // remove this line from the comment
+                    const summary = summarizeResp.replace(triageRegex, '').trim();
+                    (0,core.info)(`filename: ${filename}, triage: ${triage}`);
+                    return [filename, summary, needsReview];
                 }
                 return [filename, summarizeResp, true];
             }
@@ -11193,7 +11125,7 @@ ${commentChain}
                     const reviews = parseReview(response, patches, options.debug);
                     for (const review of reviews) {
                         // check for LGTM
-                        if (!options.reviewCommentLGTM && (review.comment.includes('LGTM') || review.comment.includes('looks good to me'))) {
+                        if (review.comment.includes('LGTM') || review.comment.includes('looks good to me')) {
                             lgtmCount += 1;
                             continue;
                         }
@@ -11320,6 +11252,67 @@ async function fetchDiffFiles(highestReviewedCommitId, pullRequest) {
     // Get files that were changed in the last commit which are also changed compared to the PR base commit
     const files = targetBranchFiles.filter(targetBranchFile => incrementalFiles.some(incrementalFile => incrementalFile.filename === targetBranchFile.filename));
     return { files, commits };
+}
+async function getFilesAndChanges(filterSelectedFiles, pullRequest, options) {
+    const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit);
+    // find hunks to review
+    const filteredFiles = await Promise.all(filterSelectedFiles.map((file) => githubConcurrencyLimit(async () => {
+        // retrieve file contents
+        let fileContent = '';
+        try {
+            const contents = await octokit/* octokit.repos.getContent */.K.repos.getContent({
+                owner: repo.owner,
+                repo: repo.repo,
+                path: file.filename,
+                ref: pullRequest.base.sha
+            });
+            if (contents.data != null) {
+                if (!Array.isArray(contents.data)) {
+                    if (contents.data.type === 'file' && contents.data.content != null) {
+                        fileContent = Buffer.from(contents.data.content, 'base64').toString();
+                    }
+                }
+            }
+        }
+        catch (e) {
+            (0,core.warning)(`Failed to get file contents: ${e}. This is OK if it's a new file.`);
+        }
+        let fileDiff = '';
+        if (file.patch != null) {
+            fileDiff = file.patch;
+        }
+        const patches = [];
+        for (const patch of splitPatch(file.patch)) {
+            const patchLines = patchStartEndLine(patch);
+            if (patchLines == null) {
+                continue;
+            }
+            const hunks = parsePatch(patch);
+            if (hunks == null) {
+                continue;
+            }
+            const hunksStr = `
+---new_hunk---
+\`\`\`
+${hunks.newHunk}
+\`\`\`
+
+---old_hunk---
+\`\`\`
+${hunks.oldHunk}
+\`\`\`
+`;
+            patches.push([patchLines.newHunk.startLine, patchLines.newHunk.endLine, hunksStr]);
+        }
+        if (patches.length > 0) {
+            return [file.filename, fileContent, fileDiff, patches];
+        }
+        else {
+            return null;
+        }
+    })));
+    // Filter out any null results
+    return filteredFiles.filter(file => file !== null);
 }
 function filterFilesByPath(files, options) {
     const filterSelectedFiles = [];

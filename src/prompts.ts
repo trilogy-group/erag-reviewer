@@ -48,8 +48,8 @@ If applicable, your summary should include a note about alterations
 to the signatures of exported functions, global data structures and 
 variables, and any changes that might affect the external interface or 
 behavior of the code.
-`
-  triageFileDiff = `Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
+
+Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
 \`APPROVED\` based on the following criteria:
 
 - If the diff involves any modifications to the logic or functionality, even if they 
@@ -73,6 +73,7 @@ Important:
 - Do not mention that these changes affect the logic or functionality of the code in 
   the summary. You must only use the triage status format above to indicate that.
 `
+
   summarizeChangesets = `Provided below are changesets in this pull request. Changesets 
 are in chronlogical order and new changesets are appended to the
 end of the list. The format consists of filename(s) and the summary 
@@ -278,11 +279,8 @@ $comment
 \`\`\`
 `
 
-  renderSummarizeFileDiff(inputs: Inputs, reviewSimpleChanges: boolean): string {
-    let prompt = this.systemMessage + this.summarizeFileDiff
-    if (reviewSimpleChanges === false) {
-      prompt += this.triageFileDiff
-    }
+  renderSummarizeFileDiff(inputs: Inputs): string {
+    const prompt = this.systemMessage + this.summarizeFileDiff
     return inputs.render(prompt)
   }
 

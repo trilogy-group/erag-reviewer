@@ -28,7 +28,6 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
-  const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit)
 
   if (!isPullRequestEvent()) {
     return
@@ -57,72 +56,7 @@ export async function codeReview(reviewBot: Bot, options: Options, prompts: Prom
     return
   }
 
-  info(`rmahfoud - filterSelectedFiles: ${filterSelectedFiles}`)
-
-  // find hunks to review
-  const filteredFiles: Array<[string, string, string, Array<[number, number, string]>] | null> = await Promise.all(
-    filterSelectedFiles.map(file =>
-      githubConcurrencyLimit(async () => {
-        // retrieve file contents
-        let fileContent = ''
-        try {
-          const contents = await octokit.repos.getContent({
-            owner: repo.owner,
-            repo: repo.repo,
-            path: file.filename,
-            ref: pullRequest.base.sha
-          })
-          if (contents.data != null) {
-            if (!Array.isArray(contents.data)) {
-              if (contents.data.type === 'file' && contents.data.content != null) {
-                fileContent = Buffer.from(contents.data.content, 'base64').toString()
-              }
-            }
-          }
-        } catch (e: any) {
-          warning(`Failed to get file contents: ${e as string}. This is OK if it's a new file.`)
-        }
-
-        let fileDiff = ''
-        if (file.patch != null) {
-          fileDiff = file.patch
-        }
-
-        const patches: Array<[number, number, string]> = []
-        for (const patch of splitPatch(file.patch)) {
-          const patchLines = patchStartEndLine(patch)
-          if (patchLines == null) {
-            continue
-          }
-          const hunks = parsePatch(patch)
-          if (hunks == null) {
-            continue
-          }
-          const hunksStr = `
----new_hunk---
-\`\`\`
-${hunks.newHunk}
-\`\`\`
-
----old_hunk---
-\`\`\`
-${hunks.oldHunk}
-\`\`\`
-`
-          patches.push([patchLines.newHunk.startLine, patchLines.newHunk.endLine, hunksStr])
-        }
-        if (patches.length > 0) {
-          return [file.filename, fileContent, fileDiff, patches] as [string, string, string, Array<[number, number, string]>]
-        } else {
-          return null
-        }
-      })
-    )
-  )
-
-  // Filter out any null results
-  const filesAndChanges = filteredFiles.filter(file => file !== null) as Array<[string, string, string, Array<[number, number, string]>]>
-
+  const filesAndChanges = await getFilesAndChanges(filterSelectedFiles, pullRequest, options)
   if (filesAndChanges.length === 0) {
     error('Skipped: no files to review')
     return
@@ -415,7 +349,7 @@ ${commentChain}
           const reviews = parseReview(response, patches, options.debug)
           for (const review of reviews) {
             // check for LGTM
-            if (!options.reviewCommentLGTM && (review.comment.includes('LGTM') || review.comment.includes('looks good to me'))) {
+            if (review.comment.includes('LGTM') || review.comment.includes('looks good to me')) {
               lgtmCount += 1
               continue
             }
@@ -559,6 +493,73 @@ async function fetchDiffFiles(highestReviewedCommitId: string, pullRequest: any)
   )
 
   return {files, commits}
+}
+
+async function getFilesAndChanges(filterSelectedFiles: any, pullRequest: any, options: Options) {
+  const githubConcurrencyLimit = pLimit(options.githubConcurrencyLimit)
+  // find hunks to review
+  const filteredFiles: Array<[string, string, string, Array<[number, number, string]>] | null> = await Promise.all(
+    filterSelectedFiles.map((file: any) =>
+      githubConcurrencyLimit(async () => {
+        // retrieve file contents
+        let fileContent = ''
+        try {
+          const contents = await octokit.repos.getContent({
+            owner: repo.owner,
+            repo: repo.repo,
+            path: file.filename,
+            ref: pullRequest.base.sha
+          })
+          if (contents.data != null) {
+            if (!Array.isArray(contents.data)) {
+              if (contents.data.type === 'file' && contents.data.content != null) {
+                fileContent = Buffer.from(contents.data.content, 'base64').toString()
+              }
+            }
+          }
+        } catch (e: any) {
+          warning(`Failed to get file contents: ${e as string}. This is OK if it's a new file.`)
+        }
+
+        let fileDiff = ''
+        if (file.patch != null) {
+          fileDiff = file.patch
+        }
+
+        const patches: Array<[number, number, string]> = []
+        for (const patch of splitPatch(file.patch)) {
+          const patchLines = patchStartEndLine(patch)
+          if (patchLines == null) {
+            continue
+          }
+          const hunks = parsePatch(patch)
+          if (hunks == null) {
+            continue
+          }
+          const hunksStr = `
+---new_hunk---
+\`\`\`
+${hunks.newHunk}
+\`\`\`
+
+---old_hunk---
+\`\`\`
+${hunks.oldHunk}
+\`\`\`
+`
+          patches.push([patchLines.newHunk.startLine, patchLines.newHunk.endLine, hunksStr])
+        }
+        if (patches.length > 0) {
+          return [file.filename, fileContent, fileDiff, patches] as [string, string, string, Array<[number, number, string]>]
+        } else {
+          return null
+        }
+      })
+    )
+  )
+
+  // Filter out any null results
+  return filteredFiles.filter(file => file !== null) as Array<[string, string, string, Array<[number, number, string]>]>
 }
 
 function filterFilesByPath(files: any, options: Options) {

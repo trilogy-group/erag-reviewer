@@ -26,10 +26,6 @@ inputs:
     required: false
     description: 'Review even when the changes are simple'
     default: 'false'
-  review_comment_lgtm:
-    required: false
-    description: 'Leave comments even if the patch is LGTM'
-    default: 'false'
   path_filters:
     required: false
     description: |

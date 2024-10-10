@@ -8,7 +8,6 @@ export class Options {
   disableReleaseNotes: boolean
   maxFiles: number
   reviewSimpleChanges: boolean
-  reviewCommentLGTM: boolean
   pathFilters: PathFilter
   systemMessage: string
   model: string
@@ -26,7 +25,6 @@ export class Options {
     this.disableReleaseNotes = getBooleanInput('disable_release_notes')
     this.maxFiles = parseInt(getInput('max_files'))
     this.reviewSimpleChanges = getBooleanInput('review_simple_changes')
-    this.reviewCommentLGTM = getBooleanInput('review_comment_lgtm')
     this.pathFilters = new PathFilter(getMultilineInput('path_filters'))
     this.systemMessage = getInput('system_message')
     this.model = getInput('model')

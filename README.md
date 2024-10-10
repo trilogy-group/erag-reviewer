@@ -24,10 +24,6 @@ It is designed to be used as a GitHub Action and can be configured to run on eve
 - **Chat with bot**: Supports conversation with the bot in the context of lines
   of code or entire files, useful for providing context, generating test cases,
   and reducing code complexity.
-- **Smart review skipping**: By default, skips in-depth review for simple
-  changes (e.g. typo fixes) and when changes look good for the most part. It can
-  be disabled by setting `review_simple_changes` and `review_comment_lgtm` to
-  `true`.
 - **Customizable prompts and models**: Use `model` and `erag_project_name` to 
   customize the llm and project ERAG uses.Tailor the `system_message`, `summarize`, 
   and `summarize_release_notes` prompts to focus on specific aspects of the review

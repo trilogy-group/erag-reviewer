@@ -10956,7 +10956,7 @@ ${filterIgnoredFiles.length > 0
                         .replace(']', '')
                         .split(',')
                         .map(symbol => symbol.trim());
-                    (0,core.info)(`filename: ${filename}, symbols: ${symbols}`);
+                    summary = summary.replace(symbolsRegex, '').trim();
                 }
                 return [filename, summary, needsReview, symbols];
             }

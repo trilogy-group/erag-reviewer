@@ -158,7 +158,7 @@ ${
             .split(',')
             .map(symbol => symbol.trim())
 
-          info(`filename: ${filename}, symbols: ${symbols}`)
+          summary = summary.replace(symbolsRegex, '').trim()
         }
 
         return [filename, summary, needsReview, symbols]

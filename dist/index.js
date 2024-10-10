@@ -11054,9 +11054,15 @@ ${summariesFailed.length > 0
         : ''}
 `;
     if (!options.disableReview) {
-        const filesAndChangesReview = filesAndChanges.filter(([filename]) => {
+        const filesAndChangesReview = filesAndChanges
+            .filter(([filename]) => {
             const needsReview = summaries.find(([summaryFilename]) => summaryFilename === filename)?.[2] ?? true;
             return needsReview;
+        })
+            .map(([filename, fileContent, fileDiff, patches]) => {
+            const summaryEntry = summaries.find(([summaryFilename]) => summaryFilename === filename);
+            const symbols = summaryEntry ? summaryEntry[3] : [];
+            return [filename, fileContent, fileDiff, patches, symbols];
         });
         const reviewsSkipped = filesAndChanges
             .filter(([filename]) => !filesAndChangesReview.some(([reviewFilename]) => reviewFilename === filename))
@@ -11065,11 +11071,12 @@ ${summariesFailed.length > 0
         const reviewsFailed = [];
         let lgtmCount = 0;
         let reviewCount = 0;
-        const doReview = async (filename, fileContent, patches) => {
+        const doReview = async (filename, fileContent, patches, symbols) => {
             if (options.debug) {
                 (0,core.info)(`reviewing ${filename}`);
                 (0,core.info)(`fileContent: ${fileContent}`);
                 (0,core.info)(`patches: ${patches}`);
+                (0,core.info)(`symbols: ${symbols}`);
             }
             // make a copy of inputs
             const ins = inputs.clone();
@@ -11168,10 +11175,10 @@ ${commentChain}
             }
         };
         const reviewPromises = [];
-        for (const [filename, fileContent, , patches] of filesAndChangesReview) {
+        for (const [filename, fileContent, , patches, symbols] of filesAndChangesReview) {
             if (options.maxFiles <= 0 || reviewPromises.length < options.maxFiles) {
                 reviewPromises.push(eragConcurrencyLimit(async () => {
-                    await doReview(filename, fileContent, patches);
+                    await doReview(filename, fileContent, patches, symbols);
                 }));
             }
             else {

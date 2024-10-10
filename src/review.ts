@@ -265,10 +265,16 @@ ${
 `
 
   if (!options.disableReview) {
-    const filesAndChangesReview = filesAndChanges.filter(([filename]) => {
-      const needsReview = summaries.find(([summaryFilename]) => summaryFilename === filename)?.[2] ?? true
-      return needsReview
-    })
+    const filesAndChangesReview = filesAndChanges
+      .filter(([filename]) => {
+        const needsReview = summaries.find(([summaryFilename]) => summaryFilename === filename)?.[2] ?? true
+        return needsReview
+      })
+      .map(([filename, fileContent, fileDiff, patches]) => {
+        const summaryEntry = summaries.find(([summaryFilename]) => summaryFilename === filename)
+        const symbols = summaryEntry ? summaryEntry[3] : []
+        return [filename, fileContent, fileDiff, patches, symbols] as [string, string, string, [number, number, string][], string[]]
+      })
 
     const reviewsSkipped = filesAndChanges
       .filter(([filename]) => !filesAndChangesReview.some(([reviewFilename]) => reviewFilename === filename))
@@ -278,11 +284,12 @@ ${
     const reviewsFailed: string[] = []
     let lgtmCount = 0
     let reviewCount = 0
-    const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>): Promise<void> => {
+    const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>, symbols: string[]): Promise<void> => {
       if (options.debug) {
         info(`reviewing ${filename}`)
         info(`fileContent: ${fileContent}`)
         info(`patches: ${patches}`)
+        info(`symbols: ${symbols}`)
       }
       // make a copy of inputs
       const ins: Inputs = inputs.clone()
@@ -385,11 +392,11 @@ ${commentChain}
     }
 
     const reviewPromises = []
-    for (const [filename, fileContent, , patches] of filesAndChangesReview) {
+    for (const [filename, fileContent, , patches, symbols] of filesAndChangesReview) {
       if (options.maxFiles <= 0 || reviewPromises.length < options.maxFiles) {
         reviewPromises.push(
           eragConcurrencyLimit(async () => {
-            await doReview(filename, fileContent, patches)
+            await doReview(filename, fileContent, patches, symbols)
           })
         )
       } else {

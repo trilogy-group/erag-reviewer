@@ -99,7 +99,7 @@ ${
 
   const summariesFailed: string[] = []
 
-  const doSummary = async (filename: string, fileContent: string, fileDiff: string): Promise<[string, string, boolean] | null> => {
+  const doSummary = async (filename: string, fileContent: string, fileDiff: string): Promise<[string, string, boolean, string[]] | null> => {
     info(`summarize: ${filename}`)
     const ins = inputs.clone()
     if (fileDiff.length === 0) {
@@ -133,19 +133,35 @@ ${
         // parse the comment to look for triage classification
         // Format is : [TRIAGE]: <NEEDS_REVIEW or APPROVED>
         // if the change needs review return true, else false
+        let needsReview = false
+        let summary = summarizeResp
+        let symbols: string[] = []
+
         const triageRegex = /\[TRIAGE\]:\s*(NEEDS_REVIEW|APPROVED)/
         const triageMatch = summarizeResp.match(triageRegex)
-
         if (triageMatch != null) {
           const triage = triageMatch[1]
-          const needsReview = triage === 'NEEDS_REVIEW'
-
+          needsReview = triage === 'NEEDS_REVIEW'
           // remove this line from the comment
-          const summary = summarizeResp.replace(triageRegex, '').trim()
+          summary = summarizeResp.replace(triageRegex, '').trim()
           info(`filename: ${filename}, triage: ${triage}`)
-          return [filename, summary, needsReview]
         }
-        return [filename, summarizeResp, true]
+
+        // Symbols to search for in the codebase to give more context to the LLM
+        const symbolsRegex = /SYMBOLS:\s*(\[.*?\])/
+        const symbolsMatch = summarizeResp.match(symbolsRegex)
+        if (symbolsMatch != null) {
+          const symbolsStr = symbolsMatch[1]
+          symbols = symbolsStr
+            .replace('[', '')
+            .replace(']', '')
+            .split(',')
+            .map(symbol => symbol.trim())
+
+          info(`filename: ${filename}, symbols: ${symbols}`)
+        }
+
+        return [filename, summary, needsReview, symbols]
       }
     } catch (e: any) {
       warning(`summarize: error from erag: ${e as string}`)
@@ -164,7 +180,7 @@ ${
     }
   }
 
-  const summaries = (await Promise.all(summaryPromises)).filter(summary => summary !== null) as Array<[string, string, boolean]>
+  const summaries = (await Promise.all(summaryPromises)).filter(summary => summary !== null) as Array<[string, string, boolean, string[]]>
 
   if (summaries.length > 0) {
     const batchSize = 10

@@ -11257,7 +11257,13 @@ async function searchSymbols(symbols) {
     const searchResults = {};
     for (const symbol of symbols) {
         try {
+            (0,core.info)(`searching for symbol: ${symbol}`);
             // Execute ripgrep to search for the symbol in the current directory
+            (0,core.info)(`rgPath: ${rgPath}`);
+            const rgExists = await execFileAsync('which', [rgPath]);
+            if (!rgExists.stdout.trim()) {
+                throw new Error(`Ripgrep not found at path: ${rgPath}`);
+            }
             const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w']);
             (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
             const lines = stdout.split('\n').filter(line => line.trim() !== '');

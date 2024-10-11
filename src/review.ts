@@ -488,7 +488,14 @@ async function searchSymbols(symbols: string[]): Promise<Record<string, SearchRe
 
   for (const symbol of symbols) {
     try {
+      info(`searching for symbol: ${symbol}`)
       // Execute ripgrep to search for the symbol in the current directory
+      info(`rgPath: ${rgPath}`)
+      const rgExists = await execFileAsync('which', [rgPath])
+      if (!rgExists.stdout.trim()) {
+        throw new Error(`Ripgrep not found at path: ${rgPath}`)
+      }
+
       const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w'])
       info(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`)
       const lines = stdout.split('\n').filter(line => line.trim() !== '')

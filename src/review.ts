@@ -163,6 +163,7 @@ ${
             .replace(']', '')
             .split(',')
             .map(symbol => symbol.trim())
+            .filter(symbol => symbol !== '')
 
           summary = summary.replace(symbolsRegex, '').trim()
         }

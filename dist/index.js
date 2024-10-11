@@ -11252,7 +11252,9 @@ async function searchSymbols(symbols) {
     const searchResults = {};
     for (const symbol of symbols) {
         try {
-            (0,core.info)(`searching for symbol: ${symbol}`);
+            (0,core.info)(`searching for symbol: ${symbol} in current directory: ${process.cwd()}`);
+            const { stdout: dirOutput } = await execFileAsync('ls', ['-R']);
+            (0,core.info)(`Directory structure:\n\n${dirOutput}\n\n`);
             try {
                 await execFileAsync('rg', ['--version']);
             }

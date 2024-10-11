@@ -68,10 +68,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install ripgrep
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ripgrep
       - uses: trilogy-group/erag-reviewer@main
         env:
           GITHUB_TOKEN: ${{ github.token }}

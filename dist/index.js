@@ -10271,7 +10271,7 @@ Additionally, please provide an array of symbols (e.g., function names, variable
 that were changed in the diff. This array will be used to search for occurrences 
 of these symbols in the codebase. The array can be empty if no relevant symbols were changed. 
 You must strictly follow the format below for the array:
-SYMBOLS: ["symbol1", "symbol2", ...]
+SYMBOLS: [symbol1, symbol2, ...]
 
 Below the summary, I would also like you to triage the diff as \`NEEDS_REVIEW\` or 
 \`APPROVED\` based on the following criteria:
@@ -10965,7 +10965,7 @@ ${filterIgnoredFiles.length > 0
                         .replace('[', '')
                         .replace(']', '')
                         .split(',')
-                        .map(symbol => symbol.trim().replace(/^"|"$/g, ''));
+                        .map(symbol => symbol.trim());
                     summary = summary.replace(symbolsRegex, '').trim();
                 }
                 return [filename, summary, needsReview, symbols];

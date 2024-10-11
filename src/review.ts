@@ -162,7 +162,7 @@ ${
             .replace('[', '')
             .replace(']', '')
             .split(',')
-            .map(symbol => symbol.trim().replace(/^"|"$/g, ''))
+            .map(symbol => symbol.trim())
 
           summary = summary.replace(symbolsRegex, '').trim()
         }

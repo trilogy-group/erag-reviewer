@@ -293,7 +293,7 @@ ${
     const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>, symbols: string[]): Promise<void> => {
       info(`reviewing ${filename}`)
       info(`patches: ${patches}`)
-      info(`symbols: ${symbols}`)
+      info(`symbols: ${symbols} - size: ${symbols.length}`)
 
       const symbolSearchResults = await searchSymbols(symbols)
       info(`symbolSearchResults: ${symbolSearchResults}`)

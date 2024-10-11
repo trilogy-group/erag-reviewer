@@ -11084,7 +11084,7 @@ ${summariesFailed.length > 0
         const doReview = async (filename, fileContent, patches, symbols) => {
             (0,core.info)(`reviewing ${filename}`);
             (0,core.info)(`patches: ${patches}`);
-            (0,core.info)(`symbols: ${symbols}`);
+            (0,core.info)(`symbols: ${symbols} - size: ${symbols.length}`);
             const symbolSearchResults = await searchSymbols(symbols);
             (0,core.info)(`symbolSearchResults: ${symbolSearchResults}`);
             // make a copy of inputs

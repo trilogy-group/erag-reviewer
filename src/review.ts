@@ -292,9 +292,10 @@ ${
     let lgtmCount = 0
     let reviewCount = 0
     const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>, symbols: string[]): Promise<void> => {
-      info(`reviewing ${filename}`)
-      info(`patches: ${patches}`)
-      info(`symbols: ${symbols} - size: ${symbols.length}`)
+      if (options.debug) {
+        info(`reviewing ${filename}`)
+        info(`symbols: ${symbols} - size: ${symbols.length}`)
+      }
 
       const symbolSearchResults = await searchSymbols(symbols)
       info(`symbolSearchResults: ${symbolSearchResults}`)
@@ -302,6 +303,7 @@ ${
       // make a copy of inputs
       const ins: Inputs = inputs.clone()
       ins.filename = filename
+      ins.symbolSearchResults = symbolSearchResults
 
       // calculate tokens based on inputs so far
       let tokens = getTokenCount(prompts.renderReviewFileDiff(ins))

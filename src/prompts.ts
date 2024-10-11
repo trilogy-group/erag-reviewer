@@ -127,10 +127,16 @@ $description
 $short_summary
 \`\`\`
 
+## Symbol Search Results
+
+\`\`\`
+$symbol_search_results
+\`\`\`
+
 ## IMPORTANT Instructions
 
 Input: New hunks annotated with line numbers and old hunks (replaced code). Hunks represent incomplete code fragments.
-Additional Context: PR title, description, summaries and comment chains.
+Additional Context: PR title, description, summaries, comment chains, and symbol search results (occurrences of modified symbols in the codebase).
 Task: Review new hunks for substantive issues using provided context and respond with comments if necessary.
 Output: Review comments in markdown with exact line number ranges in new hunks. Start and end line numbers must be within the same hunk. For single-line comments, start=end line number. Must use example response format below.
 Use fenced code blocks using the relevant language identifier where applicable.
@@ -141,6 +147,9 @@ Replacement snippet must be complete, correctly formatted & indented and without
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 
+- Do not provide general comments about making sure occurrences of modified symbols are updated. Instead analyze 
+  the symbol search results to ensure that all instances of a modified function, variable, or other symbol are 
+  correctly updated and provide specific feedback on any discrepancies found. 
 - Focus solely on offering specific, objective insights based on the 
   given context and refrain from making broad comments about potential impacts on 
   the system or question intentions behind the changes.

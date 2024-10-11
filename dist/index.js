@@ -8116,7 +8116,8 @@ class Inputs {
     diff;
     commentChain;
     comment;
-    constructor(systemMessage = '', title = 'no title provided', description = 'no description provided', rawSummary = '', shortSummary = '', filename = '', fileContent = 'file contents cannot be provided', fileDiff = 'file diff cannot be provided', patches = '', diff = 'no diff', commentChain = 'no other comments on this patch', comment = 'no comment provided') {
+    symbolSearchResults;
+    constructor(systemMessage = '', title = 'no title provided', description = 'no description provided', rawSummary = '', shortSummary = '', filename = '', fileContent = 'file contents cannot be provided', fileDiff = 'file diff cannot be provided', patches = '', diff = 'no diff', commentChain = 'no other comments on this patch', comment = 'no comment provided', symbolSearchResults = '') {
         this.systemMessage = systemMessage;
         this.title = title;
         this.description = description;
@@ -8129,9 +8130,10 @@ class Inputs {
         this.diff = diff;
         this.commentChain = commentChain;
         this.comment = comment;
+        this.symbolSearchResults = symbolSearchResults;
     }
     clone() {
-        return new Inputs(this.systemMessage, this.title, this.description, this.rawSummary, this.shortSummary, this.filename, this.fileContent, this.fileDiff, this.patches, this.diff, this.commentChain, this.comment);
+        return new Inputs(this.systemMessage, this.title, this.description, this.rawSummary, this.shortSummary, this.filename, this.fileContent, this.fileDiff, this.patches, this.diff, this.commentChain, this.comment, this.symbolSearchResults);
     }
     render(content) {
         if (!content) {
@@ -8172,6 +8174,9 @@ class Inputs {
         }
         if (this.comment) {
             content = content.replace('$comment', this.comment);
+        }
+        if (this.symbolSearchResults) {
+            content = content.replace('$symbol_search_results', this.symbolSearchResults);
         }
         return content;
     }
@@ -10341,10 +10346,16 @@ $description
 $short_summary
 \`\`\`
 
+## Symbol Search Results
+
+\`\`\`
+$symbol_search_results
+\`\`\`
+
 ## IMPORTANT Instructions
 
 Input: New hunks annotated with line numbers and old hunks (replaced code). Hunks represent incomplete code fragments.
-Additional Context: PR title, description, summaries and comment chains.
+Additional Context: PR title, description, summaries, comment chains, and symbol search results (occurrences of modified symbols in the codebase).
 Task: Review new hunks for substantive issues using provided context and respond with comments if necessary.
 Output: Review comments in markdown with exact line number ranges in new hunks. Start and end line numbers must be within the same hunk. For single-line comments, start=end line number. Must use example response format below.
 Use fenced code blocks using the relevant language identifier where applicable.
@@ -10355,6 +10366,9 @@ Replacement snippet must be complete, correctly formatted & indented and without
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 
+- Do not provide general comments about making sure occurrences of modified symbols are updated. Instead analyze 
+  the symbol search results to ensure that all instances of a modified function, variable, or other symbol are 
+  correctly updated and provide specific feedback on any discrepancies found. 
 - Focus solely on offering specific, objective insights based on the 
   given context and refrain from making broad comments about potential impacts on 
   the system or question intentions behind the changes.
@@ -11083,14 +11097,16 @@ ${summariesFailed.length > 0
         let lgtmCount = 0;
         let reviewCount = 0;
         const doReview = async (filename, fileContent, patches, symbols) => {
-            (0,core.info)(`reviewing ${filename}`);
-            (0,core.info)(`patches: ${patches}`);
-            (0,core.info)(`symbols: ${symbols} - size: ${symbols.length}`);
+            if (options.debug) {
+                (0,core.info)(`reviewing ${filename}`);
+                (0,core.info)(`symbols: ${symbols} - size: ${symbols.length}`);
+            }
             const symbolSearchResults = await searchSymbols(symbols);
             (0,core.info)(`symbolSearchResults: ${symbolSearchResults}`);
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;
+            ins.symbolSearchResults = symbolSearchResults;
             // calculate tokens based on inputs so far
             let tokens = (0,tokenizer/* getTokenCount */.V)(prompts.renderReviewFileDiff(ins));
             // loop to calculate total patch tokens

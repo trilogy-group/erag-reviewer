@@ -10857,8 +10857,6 @@ const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
-    (0,core.info)(await searchSymbols(['fetchLatestRelease', 'getGoogleAccessToken', 'fixSetup']));
-    return;
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
     if (!isPullRequestEvent()) {
@@ -11255,6 +11253,7 @@ async function searchSymbols(symbols) {
     let searchResults = '';
     for (const symbol of symbols) {
         try {
+            (0,core.info)(`Searching for symbol ${symbol} in the current directory: ${process.cwd()}`);
             searchResults += `---${symbol}---\n`;
             const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], { maxBuffer: 1024 * 1024 });
             searchResults += `${stdout.trim()}\n`;

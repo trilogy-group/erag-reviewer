@@ -31,9 +31,6 @@ const execFileAsync = promisify(execFile)
 const ignoreKeyword = '@erag: ignore'
 
 export async function codeReview(reviewBot: Bot, options: Options, prompts: Prompts): Promise<void> {
-  info(await searchSymbols(['fetchLatestRelease', 'getGoogleAccessToken', 'fixSetup']))
-  return
-
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
@@ -482,6 +479,8 @@ async function searchSymbols(symbols: string[]): Promise<string> {
 
   for (const symbol of symbols) {
     try {
+      info(`Searching for symbol ${symbol} in the current directory: ${process.cwd()}`)
+
       searchResults += `---${symbol}---\n`
       const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], {maxBuffer: 1024 * 1024})
       searchResults += `${stdout.trim()}\n`

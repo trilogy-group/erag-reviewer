@@ -135,8 +135,9 @@ Task: Review new hunks for substantive issues using provided context and respond
 Output: Review comments in markdown with exact line number ranges in new hunks. Start and end line numbers must be within the same hunk. For single-line comments, start=end line number. Must use example response format below.
 Use fenced code blocks using the relevant language identifier where applicable.
 Don't annotate code snippets with line numbers. Format and indent code correctly.
-For fixes, use \`diff\` code blocks, marking changes with \`+\` or \`-\`. The line number range for comments with fix snippets must exactly match the range to replace in the new hunk.
-If less than 2 lines of the hunk have to be replaced then you may alternatively use the \`suggestion\` format. You must carefully include any lines of code that remain unchanged in the replacement snippet to avoid issues when the replacement snippet is committed as-is. Replacement snippet must be complete, correctly formatted & indented and without the line number annotations.
+For fixes, use \`suggestion\` code blocks. The line number range for comments with fix snippets must exactly match the range to replace in the new hunk.
+You must carefully include any lines of code that remain unchanged in the replacement snippet to avoid issues when the replacement snippet is committed as-is.
+Replacement snippet must be complete, correctly formatted & indented and without the line number annotations.
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 
@@ -198,15 +199,12 @@ Please review this change.
 
 15-18:
 I suggest the following improvements:
-\`\`\`diff
+\`\`\`suggestion
 def complex_function(x, y):
--     a = x * 2
--     b = y / 3
--     return a + b
-+     a = x ** 2
-+     b = y ** 3
-+     c = a + b
-+     return c / 2
+    a = x ** 2
+    b = y ** 3
+    c = a + b
+    return c / 2
 \`\`\`
 ---
 22-22:

@@ -19,12 +19,13 @@ import {type Prompts} from './prompts'
 import {getTokenCount} from './tokenizer'
 import {execFile} from 'child_process'
 import {promisify} from 'util'
+import path from 'path'
 
 // eslint-disable-next-line camelcase
 const context = github_context
 const repo = context.repo
 
-const rgPath = './rg'
+const rgPath = path.join(__dirname, './rg')
 const execFileAsync = promisify(execFile)
 
 const ignoreKeyword = '@erag: ignore'

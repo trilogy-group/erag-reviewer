@@ -10837,6 +10837,9 @@ var tokenizer = __nccwpck_require__(652);
 const external_child_process_namespaceObject = require("child_process");
 // EXTERNAL MODULE: external "util"
 var external_util_ = __nccwpck_require__(3837);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 ;// CONCATENATED MODULE: ./lib/review.js
 
 // eslint-disable-next-line camelcase
@@ -10848,10 +10851,11 @@ var external_util_ = __nccwpck_require__(3837);
 
 
 
+
 // eslint-disable-next-line camelcase
 const context = github.context;
 const repo = context.repo;
-const rgPath = './rg';
+const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {

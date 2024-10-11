@@ -479,11 +479,7 @@ async function searchSymbols(symbols: string[]): Promise<string> {
 
   for (const symbol of symbols) {
     try {
-      info(`Searching for symbol ${symbol} in the current directory: ${process.cwd()}`)
-      // INSERT_YOUR_CODE
-      const {stdout: lsOutput} = await execFileAsync('ls', ['-la'], {cwd: process.cwd()})
-      info(`Files and directories in the current directory:\n${lsOutput}`)
-
+      info(`Searching for symbol ${symbol}`)
       searchResults += `---${symbol}---\n`
       const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], {maxBuffer: 1024 * 1024})
       searchResults += `${stdout.trim()}\n`

@@ -291,12 +291,10 @@ ${
     let lgtmCount = 0
     let reviewCount = 0
     const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>, symbols: string[]): Promise<void> => {
-      if (options.debug) {
-        info(`reviewing ${filename}`)
-        info(`fileContent: ${fileContent}`)
-        info(`patches: ${patches}`)
-        info(`symbols: ${symbols}`)
-      }
+      info(`reviewing ${filename}`)
+      info(`fileContent: ${fileContent}`)
+      info(`patches: ${patches}`)
+      info(`symbols: ${symbols}`)
 
       const symbolSearchResults = await searchSymbols(symbols)
       info(`symbolSearchResults: ${symbolSearchResults}`)

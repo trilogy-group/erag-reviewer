@@ -19,11 +19,13 @@ import {type Prompts} from './prompts'
 import {getTokenCount} from './tokenizer'
 import {execFile} from 'child_process'
 import {promisify} from 'util'
+import path from 'path'
 
 // eslint-disable-next-line camelcase
 const context = github_context
 const repo = context.repo
 
+const rgPath = path.join(__dirname, './rg')
 const execFileAsync = promisify(execFile)
 
 const ignoreKeyword = '@erag: ignore'
@@ -487,23 +489,14 @@ async function searchSymbols(symbols: string[]): Promise<Record<string, SearchRe
   for (const symbol of symbols) {
     try {
       info(`searching for symbol: ${symbol}`)
-
-      // Install ripgrep if not installed
-      try {
-        await execFileAsync('rg', ['--version'])
-      } catch {
-        try {
-          warning('ripgrep is not installed. Attempting to install...')
-          await execFileAsync('apt-get', ['update'])
-          await execFileAsync('apt-get', ['install', '-y', 'ripgrep'])
-          info('ripgrep installed successfully.')
-        } catch (e: any) {
-          warning(`Failed to install ripgrep: ${e.message as string}`)
-        }
+      // Execute ripgrep to search for the symbol in the current directory
+      info(`rgPath: ${rgPath}`)
+      const rgExists = await execFileAsync('which', [rgPath])
+      if (!rgExists.stdout.trim()) {
+        throw new Error(`Ripgrep not found at path: ${rgPath}`)
       }
 
-      // Execute ripgrep to search for the symbol in the current directory
-      const {stdout} = await execFileAsync('rg', [symbol, '-n', '-w'])
+      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w'])
       info(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`)
       const lines = stdout.split('\n').filter(line => line.trim() !== '')
 

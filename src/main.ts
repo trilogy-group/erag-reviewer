@@ -5,10 +5,34 @@ import {Prompts} from './prompts'
 import {codeReview} from './review'
 import {handleReviewComment} from './review-comment'
 
+function tempPrintCurrentDirectoryAndContents(): void {
+  const fs = require('fs')
+  const path = require('path')
+
+  const currentDirectory = process.cwd()
+  info(`Current Directory: ${currentDirectory}`)
+
+  fs.readdir(currentDirectory, (err: any, files: any) => {
+    if (err) {
+      warning(`Failed to read directory contents: ${err}`)
+      return
+    }
+
+    info('Files/Folders present:')
+    for (const file of files) {
+      const fullPath = path.join(currentDirectory, file)
+      const isDirectory = fs.lstatSync(fullPath).isDirectory()
+      info(`${file} ${isDirectory ? '(Directory)' : '(File)'}`)
+    }
+  })
+}
+
 async function run(): Promise<void> {
   let options: Options
   let prompts: Prompts
   let reviewBot: Bot
+
+  tempPrintCurrentDirectoryAndContents()
 
   try {
     options = new Options()

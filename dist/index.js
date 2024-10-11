@@ -8199,10 +8199,29 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 
+function tempPrintCurrentDirectoryAndContents() {
+    const fs = __nccwpck_require__(7147);
+    const path = __nccwpck_require__(1017);
+    const currentDirectory = process.cwd();
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Current Directory: ${currentDirectory}`);
+    fs.readdir(currentDirectory, (err, files) => {
+        if (err) {
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.warning)(`Failed to read directory contents: ${err}`);
+            return;
+        }
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)('Files/Folders present:');
+        for (const file of files) {
+            const fullPath = path.join(currentDirectory, file);
+            const isDirectory = fs.lstatSync(fullPath).isDirectory();
+            (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`${file} ${isDirectory ? '(Directory)' : '(File)'}`);
+        }
+    });
+}
 async function run() {
     let options;
     let prompts;
     let reviewBot;
+    tempPrintCurrentDirectoryAndContents();
     try {
         options = new _options__WEBPACK_IMPORTED_MODULE_2__/* .Options */ .E();
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(options.toString());

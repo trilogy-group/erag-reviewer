@@ -10859,6 +10859,8 @@ const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
+    await searchSymbols(['getGoogleAccessToken', 'fixSetup']);
+    return;
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
     if (!isPullRequestEvent()) {
@@ -11090,7 +11092,6 @@ ${summariesFailed.length > 0
                 (0,core.info)(`patches: ${patches}`);
                 (0,core.info)(`symbols: ${symbols}`);
             }
-            await searchSymbols(symbols);
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;

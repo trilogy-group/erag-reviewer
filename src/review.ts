@@ -31,6 +31,10 @@ const execFileAsync = promisify(execFile)
 const ignoreKeyword = '@erag: ignore'
 
 export async function codeReview(reviewBot: Bot, options: Options, prompts: Prompts): Promise<void> {
+  await searchSymbols(['getGoogleAccessToken', 'fixSetup'])
+  return
+
+
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
@@ -297,8 +301,6 @@ ${
         info(`patches: ${patches}`)
         info(`symbols: ${symbols}`)
       }
-
-      await searchSymbols(symbols)
 
       // make a copy of inputs
       const ins: Inputs = inputs.clone()

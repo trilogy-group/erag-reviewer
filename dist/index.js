@@ -10859,8 +10859,6 @@ const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
-    await searchSymbols(['getGoogleAccessToken', 'fixSetup']);
-    return;
     const commenter = new lib_commenter/* Commenter */.Es();
     const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit);
     if (!isPullRequestEvent()) {
@@ -11092,6 +11090,8 @@ ${summariesFailed.length > 0
                 (0,core.info)(`patches: ${patches}`);
                 (0,core.info)(`symbols: ${symbols}`);
             }
+            const symbolSearchResults = await searchSymbols(symbols);
+            (0,core.info)(`symbolSearchResults: ${symbolSearchResults}`);
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;
@@ -11254,26 +11254,18 @@ ${reviewsSkipped.length > 0
     await commenter.comment(`${summarizeComment}`, lib_commenter/* SUMMARIZE_TAG */.Rp, 'replace');
 }
 async function searchSymbols(symbols) {
-    const searchResults = {};
+    // Uses ripgrep to search for the symbols in the codebase
+    let searchResults = '';
     for (const symbol of symbols) {
         try {
+            searchResults += `---${symbol}---\n`;
             const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.']);
-            (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
-            const lines = stdout.split('\n').filter(line => line.trim() !== '');
-            searchResults[symbol] = lines.map(line => {
-                const [file, lineNumber, ...matchParts] = line.split(':');
-                return {
-                    file,
-                    line: parseInt(lineNumber, 10),
-                    match: matchParts.join(':').trim()
-                };
-            });
+            searchResults += `${stdout.trim()}\n`;
         }
         catch (err) {
             (0,core.warning)(`Error searching for symbol ${symbol}: ${err.message}`);
         }
     }
-    (0,core.info)(`\n\nsearchResults: ${JSON.stringify(searchResults, null, 2)}\n\n`);
     return searchResults;
 }
 async function determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter) {

@@ -31,10 +31,6 @@ const execFileAsync = promisify(execFile)
 const ignoreKeyword = '@erag: ignore'
 
 export async function codeReview(reviewBot: Bot, options: Options, prompts: Prompts): Promise<void> {
-  await searchSymbols(['getGoogleAccessToken', 'fixSetup'])
-  return
-
-
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
@@ -302,6 +298,9 @@ ${
         info(`symbols: ${symbols}`)
       }
 
+      const symbolSearchResults = await searchSymbols(symbols)
+      info(`symbolSearchResults: ${symbolSearchResults}`)
+
       // make a copy of inputs
       const ins: Inputs = inputs.clone()
       ins.filename = filename
@@ -477,35 +476,19 @@ ${
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
 }
 
-interface SearchResult {
-  file: string
-  line: number
-  match: string
-}
-
-async function searchSymbols(symbols: string[]): Promise<Record<string, SearchResult[]>> {
-  const searchResults: Record<string, SearchResult[]> = {}
+async function searchSymbols(symbols: string[]): Promise<string> {
+  // Uses ripgrep to search for the symbols in the codebase
+  let searchResults = ''
 
   for (const symbol of symbols) {
     try {
+      searchResults += `---${symbol}---\n`
       const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'])
-      info(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`)
-      const lines = stdout.split('\n').filter(line => line.trim() !== '')
-
-      searchResults[symbol] = lines.map(line => {
-        const [file, lineNumber, ...matchParts] = line.split(':')
-        return {
-          file,
-          line: parseInt(lineNumber, 10),
-          match: matchParts.join(':').trim()
-        }
-      })
+      searchResults += `${stdout.trim()}\n`
     } catch (err: any) {
       warning(`Error searching for symbol ${symbol}: ${err.message as string}`)
     }
   }
-
-  info(`\n\nsearchResults: ${JSON.stringify(searchResults, null, 2)}\n\n`)
 
   return searchResults
 }

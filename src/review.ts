@@ -31,6 +31,10 @@ const execFileAsync = promisify(execFile)
 const ignoreKeyword = '@erag: ignore'
 
 export async function codeReview(reviewBot: Bot, options: Options, prompts: Prompts): Promise<void> {
+  await searchSymbols(['getGoogleAccessToken', 'fixSetup'])
+  await searchSymbols(["getGoogleAccessToken", "fixSetup"])
+  return
+
   const commenter: Commenter = new Commenter()
 
   const eragConcurrencyLimit = pLimit(options.eragConcurrencyLimit)
@@ -292,7 +296,6 @@ ${
     let reviewCount = 0
     const doReview = async (filename: string, fileContent: string, patches: Array<[number, number, string]>, symbols: string[]): Promise<void> => {
       info(`reviewing ${filename}`)
-      info(`fileContent: ${fileContent}`)
       info(`patches: ${patches}`)
       info(`symbols: ${symbols}`)
 

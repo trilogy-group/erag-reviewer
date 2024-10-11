@@ -26,7 +26,7 @@ export class Inputs {
     diff = 'no diff',
     commentChain = 'no other comments on this patch',
     comment = 'no comment provided',
-    symbolSearchResults = ''
+    symbolSearchResults = 'No symbol search results'
   ) {
     this.systemMessage = systemMessage
     this.title = title

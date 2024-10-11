@@ -17,10 +17,14 @@ import {octokit} from './octokit'
 import {type Options} from './options'
 import {type Prompts} from './prompts'
 import {getTokenCount} from './tokenizer'
+import {rgPath} from '@vscode/ripgrep'
+import {execFile} from 'child_process'
+import {promisify} from 'util'
 
 // eslint-disable-next-line camelcase
 const context = github_context
 const repo = context.repo
+const execFileAsync = promisify(execFile)
 
 const ignoreKeyword = '@erag: ignore'
 
@@ -291,6 +295,9 @@ ${
         info(`patches: ${patches}`)
         info(`symbols: ${symbols}`)
       }
+
+      await searchSymbols(symbols)
+
       // make a copy of inputs
       const ins: Inputs = inputs.clone()
       ins.filename = filename
@@ -464,6 +471,40 @@ ${
 
   // post the final summary comment
   await commenter.comment(`${summarizeComment}`, SUMMARIZE_TAG, 'replace')
+}
+
+interface SearchResult {
+  file: string
+  line: number
+  match: string
+}
+
+async function searchSymbols(symbols: string[]): Promise<Record<string, SearchResult[]>> {
+  const searchResults: Record<string, SearchResult[]> = {}
+
+  for (const symbol of symbols) {
+    try {
+      // Execute ripgrep to search for the symbol in the current directory
+      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w'])
+      info(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`)
+      const lines = stdout.split('\n').filter(line => line.trim() !== '')
+
+      searchResults[symbol] = lines.map(line => {
+        const [file, lineNumber, ...matchParts] = line.split(':')
+        return {
+          file,
+          line: parseInt(lineNumber, 10),
+          match: matchParts.join(':').trim()
+        }
+      })
+    } catch (err: any) {
+      warning(`Error searching for symbol ${symbol}: ${err.message as string}`)
+    }
+  }
+
+  info(`\n\nsearchResults: ${JSON.stringify(searchResults, null, 2)}\n\n`)
+
+  return searchResults
 }
 
 async function determineHighestReviewedCommitId(existingCommitIdsBlock: string, pullRequest: any, commenter: Commenter) {

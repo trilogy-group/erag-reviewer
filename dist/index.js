@@ -8191,7 +8191,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _bot__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(2394);
 /* harmony import */ var _options__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1846);
 /* harmony import */ var _prompts__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(4272);
-/* harmony import */ var _review__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(2612);
+/* harmony import */ var _review__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(2033);
 /* harmony import */ var _review_comment__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(5947);
 
 
@@ -10672,7 +10672,7 @@ const handleReviewComment = async (reviewBot, options, prompts) => {
 
 /***/ }),
 
-/***/ 2612:
+/***/ 2033:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -10833,6 +10833,12 @@ var lib_inputs = __nccwpck_require__(6180);
 var octokit = __nccwpck_require__(3258);
 // EXTERNAL MODULE: ./lib/tokenizer.js
 var tokenizer = __nccwpck_require__(652);
+// EXTERNAL MODULE: ./node_modules/@vscode/ripgrep/lib/index.js
+var lib = __nccwpck_require__(5455);
+;// CONCATENATED MODULE: external "child_process"
+const external_child_process_namespaceObject = require("child_process");
+// EXTERNAL MODULE: external "util"
+var external_util_ = __nccwpck_require__(3837);
 ;// CONCATENATED MODULE: ./lib/review.js
 
 // eslint-disable-next-line camelcase
@@ -10842,9 +10848,13 @@ var tokenizer = __nccwpck_require__(652);
 
 
 
+
+
+
 // eslint-disable-next-line camelcase
 const context = github.context;
 const repo = context.repo;
+const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
     const commenter = new lib_commenter/* Commenter */.Es();
@@ -11078,6 +11088,7 @@ ${summariesFailed.length > 0
                 (0,core.info)(`patches: ${patches}`);
                 (0,core.info)(`symbols: ${symbols}`);
             }
+            await searchSymbols(symbols);
             // make a copy of inputs
             const ins = inputs.clone();
             ins.filename = filename;
@@ -11238,6 +11249,30 @@ ${reviewsSkipped.length > 0
     }
     // post the final summary comment
     await commenter.comment(`${summarizeComment}`, lib_commenter/* SUMMARIZE_TAG */.Rp, 'replace');
+}
+async function searchSymbols(symbols) {
+    const searchResults = {};
+    for (const symbol of symbols) {
+        try {
+            // Execute ripgrep to search for the symbol in the current directory
+            const { stdout } = await execFileAsync(lib/* rgPath */.$, [symbol, '-n', '-w']);
+            (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
+            const lines = stdout.split('\n').filter(line => line.trim() !== '');
+            searchResults[symbol] = lines.map(line => {
+                const [file, lineNumber, ...matchParts] = line.split(':');
+                return {
+                    file,
+                    line: parseInt(lineNumber, 10),
+                    match: matchParts.join(':').trim()
+                };
+            });
+        }
+        catch (err) {
+            (0,core.warning)(`Error searching for symbol ${symbol}: ${err.message}`);
+        }
+    }
+    (0,core.info)(`\n\nsearchResults: ${JSON.stringify(searchResults, null, 2)}\n\n`);
+    return searchResults;
 }
 async function determineHighestReviewedCommitId(existingCommitIdsBlock, pullRequest, commenter) {
     const allCommitIds = await commenter.getAllCommitIds();
@@ -28230,6 +28265,18 @@ module.exports.implForWrapper = function (wrapper) {
 };
 
 
+
+/***/ }),
+
+/***/ 5455:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const path = __nccwpck_require__(1017);
+
+module.exports.$ = path.join(__dirname, `../bin/rg${process.platform === 'win32' ? '.exe' : ''}`);
 
 /***/ }),
 

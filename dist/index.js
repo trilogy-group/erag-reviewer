@@ -10851,6 +10851,7 @@ var external_util_ = __nccwpck_require__(3837);
 // eslint-disable-next-line camelcase
 const context = github.context;
 const repo = context.repo;
+const rgPath = './rg';
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
@@ -11252,14 +11253,7 @@ async function searchSymbols(symbols) {
     const searchResults = {};
     for (const symbol of symbols) {
         try {
-            try {
-                await execFileAsync('rg', ['--version']);
-            }
-            catch (err) {
-                (0,core.warning)('rg is not installed');
-                return {};
-            }
-            const { stdout } = await execFileAsync('rg', [symbol, '-n', '-w', '.']);
+            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.']);
             (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
             const lines = stdout.split('\n').filter(line => line.trim() !== '');
             searchResults[symbol] = lines.map(line => {

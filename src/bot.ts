@@ -45,7 +45,9 @@ export class Bot {
     let response: string = ''
     try {
       if (this.options.debug) {
-        info(`Sending message to erag:\n\n ${message}\n\n`)
+        info('::group::Sending message to erag')
+        info(`\n\n ${message}\n\n`)
+        info('::endgroup::')
       }
 
       response = await pRetry(() => this.api!.sendMessage(message), {
@@ -53,7 +55,9 @@ export class Bot {
       })
 
       if (this.options.debug) {
-        info(`Received response from erag:\n\n ${response}\n\n`)
+        info('::group::Received response from erag')
+        info(`\n\n ${response}\n\n`)
+        info('::endgroup::')
       }
     } catch (err: any) {
       error(`Failed to send message to erag: ${err}`)

@@ -7430,13 +7430,17 @@ class Bot {
         let response = '';
         try {
             if (this.options.debug) {
-                (0,core.info)(`Sending message to erag:\n\n ${message}\n\n`);
+                (0,core.info)('::group::Sending message to erag');
+                (0,core.info)(`\n\n ${message}\n\n`);
+                (0,core.info)('::endgroup::');
             }
             response = await pRetry(() => this.api.sendMessage(message), {
                 retries: this.options.eragRetries
             });
             if (this.options.debug) {
-                (0,core.info)(`Received response from erag:\n\n ${response}\n\n`);
+                (0,core.info)('::group::Received response from erag');
+                (0,core.info)(`\n\n ${response}\n\n`);
+                (0,core.info)('::endgroup::');
             }
         }
         catch (err) {

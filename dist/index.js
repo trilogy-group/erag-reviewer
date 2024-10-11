@@ -11252,9 +11252,6 @@ async function searchSymbols(symbols) {
     const searchResults = {};
     for (const symbol of symbols) {
         try {
-            (0,core.info)(`searching for symbol: ${symbol} in current directory: ${process.cwd()}`);
-            const { stdout: dirOutput } = await execFileAsync('ls', ['-R']);
-            (0,core.info)(`Directory structure:\n\n${dirOutput}\n\n`);
             try {
                 await execFileAsync('rg', ['--version']);
             }
@@ -11262,7 +11259,7 @@ async function searchSymbols(symbols) {
                 (0,core.warning)('rg is not installed');
                 return {};
             }
-            const { stdout } = await execFileAsync('rg', [symbol, '-n', '-w']);
+            const { stdout } = await execFileAsync('rg', [symbol, '-n', '-w', '.']);
             (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
             const lines = stdout.split('\n').filter(line => line.trim() !== '');
             searchResults[symbol] = lines.map(line => {

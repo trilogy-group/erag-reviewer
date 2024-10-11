@@ -10833,12 +10833,13 @@ var lib_inputs = __nccwpck_require__(6180);
 var octokit = __nccwpck_require__(3258);
 // EXTERNAL MODULE: ./lib/tokenizer.js
 var tokenizer = __nccwpck_require__(652);
-// EXTERNAL MODULE: ./node_modules/@vscode/ripgrep/lib/index.js
-var lib = __nccwpck_require__(5455);
 ;// CONCATENATED MODULE: external "child_process"
 const external_child_process_namespaceObject = require("child_process");
 // EXTERNAL MODULE: external "util"
 var external_util_ = __nccwpck_require__(3837);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 ;// CONCATENATED MODULE: ./lib/review.js
 
 // eslint-disable-next-line camelcase
@@ -10854,6 +10855,7 @@ var external_util_ = __nccwpck_require__(3837);
 // eslint-disable-next-line camelcase
 const context = github.context;
 const repo = context.repo;
+const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
@@ -11255,7 +11257,7 @@ async function searchSymbols(symbols) {
     for (const symbol of symbols) {
         try {
             // Execute ripgrep to search for the symbol in the current directory
-            const { stdout } = await execFileAsync(lib/* rgPath */.$, [symbol, '-n', '-w']);
+            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w']);
             (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
             const lines = stdout.split('\n').filter(line => line.trim() !== '');
             searchResults[symbol] = lines.map(line => {
@@ -28265,18 +28267,6 @@ module.exports.implForWrapper = function (wrapper) {
 };
 
 
-
-/***/ }),
-
-/***/ 5455:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const path = __nccwpck_require__(1017);
-
-module.exports.$ = path.join(__dirname, `../bin/rg${process.platform === 'win32' ? '.exe' : ''}`);
 
 /***/ }),
 

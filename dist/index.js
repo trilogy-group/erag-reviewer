@@ -11255,11 +11255,18 @@ async function searchSymbols(symbols) {
     for (const symbol of symbols) {
         try {
             searchResults += `---${symbol}---\n`;
-            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.']);
+            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], { maxBuffer: 1024 * 1024 });
             searchResults += `${stdout.trim()}\n`;
         }
         catch (err) {
-            (0,core.warning)(`Error searching for symbol ${symbol}: ${err.message}`);
+            if (err.code === 1) {
+                // Ripgrep exits with code 1 if no matches are found
+                (0,core.info)(`No matches found for symbol ${symbol}`);
+                searchResults += `No matches found for symbol ${symbol}\n`;
+            }
+            else {
+                (0,core.warning)(`Error searching for symbol ${symbol}: ${err.message}`);
+            }
         }
     }
     return searchResults;

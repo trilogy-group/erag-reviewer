@@ -481,10 +481,16 @@ async function searchSymbols(symbols: string[]): Promise<string> {
   for (const symbol of symbols) {
     try {
       searchResults += `---${symbol}---\n`
-      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'])
+      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], {maxBuffer: 1024 * 1024})
       searchResults += `${stdout.trim()}\n`
     } catch (err: any) {
-      warning(`Error searching for symbol ${symbol}: ${err.message as string}`)
+      if (err.code === 1) {
+        // Ripgrep exits with code 1 if no matches are found
+        info(`No matches found for symbol ${symbol}`)
+        searchResults += `No matches found for symbol ${symbol}\n`
+      } else {
+        warning(`Error searching for symbol ${symbol}: ${err.message as string}`)
+      }
     }
   }
 

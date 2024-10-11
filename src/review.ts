@@ -31,8 +31,8 @@ const execFileAsync = promisify(execFile)
 const ignoreKeyword = '@erag: ignore'
 
 export async function codeReview(reviewBot: Bot, options: Options, prompts: Prompts): Promise<void> {
-  await searchSymbols(['getGoogleAccessToken', 'fixSetup'])
-  await searchSymbols(["getGoogleAccessToken", "fixSetup"])
+  info(await searchSymbols(['getGoogleAccessToken', 'fixSetup']))
+  info(await searchSymbols(["getGoogleAccessToken", "fixSetup"]))
   return
 
   const commenter: Commenter = new Commenter()

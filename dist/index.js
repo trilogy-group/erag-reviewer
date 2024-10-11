@@ -10837,6 +10837,9 @@ var tokenizer = __nccwpck_require__(652);
 const external_child_process_namespaceObject = require("child_process");
 // EXTERNAL MODULE: external "util"
 var external_util_ = __nccwpck_require__(3837);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 ;// CONCATENATED MODULE: ./lib/review.js
 
 // eslint-disable-next-line camelcase
@@ -10848,9 +10851,11 @@ var external_util_ = __nccwpck_require__(3837);
 
 
 
+
 // eslint-disable-next-line camelcase
 const context = github.context;
 const repo = context.repo;
+const rgPath = external_path_default().join(__dirname, './rg');
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
@@ -11253,23 +11258,13 @@ async function searchSymbols(symbols) {
     for (const symbol of symbols) {
         try {
             (0,core.info)(`searching for symbol: ${symbol}`);
-            // Install ripgrep if not installed
-            try {
-                await execFileAsync('rg', ['--version']);
-            }
-            catch {
-                try {
-                    (0,core.warning)('ripgrep is not installed. Attempting to install...');
-                    await execFileAsync('apt-get', ['update']);
-                    await execFileAsync('apt-get', ['install', '-y', 'ripgrep']);
-                    (0,core.info)('ripgrep installed successfully.');
-                }
-                catch (e) {
-                    (0,core.warning)(`Failed to install ripgrep: ${e.message}`);
-                }
-            }
             // Execute ripgrep to search for the symbol in the current directory
-            const { stdout } = await execFileAsync('rg', [symbol, '-n', '-w']);
+            (0,core.info)(`rgPath: ${rgPath}`);
+            const rgExists = await execFileAsync('which', [rgPath]);
+            if (!rgExists.stdout.trim()) {
+                throw new Error(`Ripgrep not found at path: ${rgPath}`);
+            }
+            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w']);
             (0,core.info)(`stdout for search symbol ${symbol}: \n\n${stdout}\n\n`);
             const lines = stdout.split('\n').filter(line => line.trim() !== '');
             searchResults[symbol] = lines.map(line => {

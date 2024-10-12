@@ -10370,7 +10370,9 @@ Replacement snippet must be complete, correctly formatted & indented and without
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 
-- Pay special attention to changes in function signatures. Ensure that all occurrences of the modified function in the codebase are updated accordingly, as indicated in the symbol search results.
+- Pay special attention to changes in function signatures. Ensure that all occurrences of the modified function in the codebase
+  are updated accordingly, as indicated in the symbol search results. If any occurrences are not updated, provide specific feedback
+  indicating the locations of these discrepancies.
 - Focus solely on offering specific, objective insights based on the 
   given context and refrain from making broad comments about potential impacts on 
   the system or question intentions behind the changes.

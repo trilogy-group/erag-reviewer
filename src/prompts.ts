@@ -143,8 +143,7 @@ Use fenced code blocks using the relevant language identifier where applicable.
 Don't annotate code snippets with line numbers. Format and indent code correctly.
 For fixes, use \`suggestion\` code blocks. The \`suggestion\` code block will be committed as-is, so ensure that it is a valid replacement for the specified line range.
 Replacement snippet must be complete, correctly formatted & indented and without the line number annotations.
-DO NOT add lines to the \`suggestion\` code block that cannot be used to directly replace the specified line range. In those cases, don't provide a suggestion. 
-(For example, don't give a suggestion containing the entire function for a line range that only modifies a single line.)
+DO NOT add lines to the \`suggestion\` code block that cannot be used to directly replace the specified line range. In those cases, don't provide a suggestion.
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 

@@ -10367,6 +10367,7 @@ Don't annotate code snippets with line numbers. Format and indent code correctly
 For fixes, use \`suggestion\` code blocks. The line number range for comments with fix snippets must exactly match the range to replace in the new hunk.
 You must carefully include any lines of code that remain unchanged in the replacement snippet to avoid issues when the replacement snippet is committed as-is.
 Replacement snippet must be complete, correctly formatted & indented and without the line number annotations.
+DO NOT suggest changes to lines that are not part of the diff. (For example, don't suggest a change to the entire function if not all lines of the function are modified and shown in the new hunk.)
 
 - Do NOT provide general feedback, summaries, explanations of changes, or praises 
   for making good additions. 
@@ -10381,6 +10382,14 @@ If there are no issues found on a line range, you MUST respond with the
 text \`LGTM!\` for that line range in the review section. 
 
 ## Example
+
+### Example Symbol Search Results
+
+\`\`\`
+---divide---
+./electronapp/src/arithmetic.py:27:def divide(x, y):
+./electronapp/src/compute.py:106:    divide(10)
+\`\`\`
 
 ### Example changes
 
@@ -10400,6 +10409,9 @@ text \`LGTM!\` for that line range in the review section.
 23: 
 24: def multiply(x, y):
 25:     return x * y
+26:
+27: def divide(x, y):
+28:     return x / y
 
 def subtract(x, y):
   z = x - y
@@ -10447,6 +10459,10 @@ There's a syntax error in the add function.
 ---
 24-25:
 LGTM!
+---
+27-28:
+The divide function is used in ./electronapp/src/compute.py:106 with a single argument,
+where it should be used with two arguments.
 ---
 
 ## Changes made to \`$filename\` for your review

@@ -1,9 +1,7 @@
 import {type Inputs} from './inputs'
 
 export class Prompts {
-  systemMessage = `$system_message
-
-`
+  systemMessage = `$system_message\n`
 
   summarize = `
 Provide your final response in markdown with the following content:
@@ -307,38 +305,19 @@ $comment
 \`\`\`
 `
 
-  renderSummarizeFileDiff(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.summarizeFileDiff
-    return inputs.render(prompt)
-  }
+  renderComment = (inputs: Inputs) => `
+You are a code review assistant. Continue this code review discussion thread.
 
-  renderSummarizeChangesets(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.summarizeChangesets
-    return inputs.render(prompt)
-  }
+Context:
+${inputs.diff}
 
-  renderSummarize(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.summarizePrefix + this.summarize
-    return inputs.render(prompt)
-  }
+Previous comments:
+${inputs.commentChain}
 
-  renderSummarizeShort(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.summarizePrefix + this.summarizeShort
-    return inputs.render(prompt)
-  }
+Latest comment:
+${inputs.comment}
 
-  renderSummarizeReleaseNotes(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.summarizePrefix + this.summarizeReleaseNotes
-    return inputs.render(prompt)
-  }
-
-  renderComment(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.comment
-    return inputs.render(prompt)
-  }
-
-  renderReviewFileDiff(inputs: Inputs): string {
-    const prompt = this.systemMessage + this.reviewFileDiff
-    return inputs.render(prompt)
-  }
+Provide a helpful, technical response that moves the discussion forward. If the discussion seems resolved, say so.
+If you need more context, mention specific files or symbols that would help you understand better.
+`
 }

@@ -2,7 +2,7 @@ import {info, setFailed, warning} from '@actions/core'
 import {Bot} from './bot'
 import {Options} from './options'
 import {Prompts} from './prompts'
-import {codeReview} from './review'
+import {codeReview} from './review_old'
 import {handleReviewComment} from './review-comment'
 
 async function run(): Promise<void> {

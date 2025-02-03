@@ -22,6 +22,9 @@ export class TokenLimits {
     } else if (model === 'bedrock-claude3.5-sonnet') {
       this.maxTokens = 16000
       this.responseTokens = 4000
+    } else if (model.includes('o1-mini') {
+      this.maxTokens = 128000
+      this.responseTokens = 65000
     } else {
       this.maxTokens = 4000
       this.responseTokens = 1000

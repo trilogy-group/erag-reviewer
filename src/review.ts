@@ -452,9 +452,9 @@ ${
 <details>
 <summary>Tips</summary>
 
-### Chat with <img src="https://raw.githubusercontent.com/trilogy-group/ai-pr-reviewer/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">  ERAG Reviewer (\`@erag\`)
+### Chat with <img src="https://raw.githubusercontent.com/trilogy-group/ai-pr-reviewer/main/docs/images/EragIcon.png" alt="Image description" width="20" height="20">  ERAG Reviewer
 - Reply on review comments left by this bot to ask follow-up questions. A review comment is a comment on a diff or a file.
-- Invite the bot into a review comment chain by tagging \`@erag\` in a reply.
+- Invite the bot into a review comment chain by tagging \`@askErag\` in a reply.
 
 ### Code suggestions
 - The bot may make code suggestions, but please review them carefully before committing since the line number ranges may be misaligned. 

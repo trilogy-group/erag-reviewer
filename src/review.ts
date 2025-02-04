@@ -26,6 +26,7 @@ const context = github_context
 const repo = context.repo
 
 const rgPath = path.join(__dirname, './rg')
+const maxSearchResults = 50
 const execFileAsync = promisify(execFile)
 
 const ignoreKeyword = '@erag: ignore'
@@ -484,7 +485,7 @@ async function searchSymbols(symbols: string[]): Promise<string> {
     try {
       info(`Searching for symbol ${symbol}`)
       searchResults += `---${symbol}---\n`
-      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], {maxBuffer: 1024 * 1024})
+      const {stdout} = await execFileAsync(rgPath, [symbol, '-n', '-w', '-m', maxSearchResults.toString(), '.'], {maxBuffer: 1024 * 1024})
       searchResults += `${stdout.trim()}\n`
     } catch (err: any) {
       if (err.code === 1) {

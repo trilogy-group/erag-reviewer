@@ -10891,6 +10891,7 @@ var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 const context = github.context;
 const repo = context.repo;
 const rgPath = external_path_default().join(__dirname, './rg');
+const maxSearchResults = 50;
 const execFileAsync = (0,external_util_.promisify)(external_child_process_namespaceObject.execFile);
 const ignoreKeyword = '@erag: ignore';
 async function codeReview(reviewBot, options, prompts) {
@@ -11295,7 +11296,7 @@ async function searchSymbols(symbols) {
         try {
             (0,core.info)(`Searching for symbol ${symbol}`);
             searchResults += `---${symbol}---\n`;
-            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '.'], { maxBuffer: 1024 * 1024 });
+            const { stdout } = await execFileAsync(rgPath, [symbol, '-n', '-w', '-m', maxSearchResults.toString(), '.'], { maxBuffer: 1024 * 1024 });
             searchResults += `${stdout.trim()}\n`;
         }
         catch (err) {

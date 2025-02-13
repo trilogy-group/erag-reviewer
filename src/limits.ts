@@ -26,8 +26,9 @@ export class TokenLimits {
       this.maxTokens = 128000
       this.responseTokens = 65000
     } else if (model.includes('o3-mini')) {
-      this.maxTokens = 128000
-      this.responseTokens = 65000
+      // o3-mini can take 200k tokens, but we need to keep some buffer for reasoning tokens
+      this.maxTokens = 150000
+      this.responseTokens = 90000
     } else {
       this.maxTokens = 4000
       this.responseTokens = 1000

@@ -172,7 +172,7 @@ inputs:
   erag_concurrency_limit:
     required: false
     description: 'How many concurrent API calls to make to Erag servers?'
-    default: '6'
+    default: '3'
   github_concurrency_limit:
     required: false
     description: 'How many concurrent API calls to make to GitHub?'

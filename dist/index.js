@@ -8366,6 +8366,14 @@ class TokenLimits {
             this.maxTokens = 120000;
             this.responseTokens = 90000;
         }
+        else if (model.includes('claude-3-7-sonnet')) {
+            this.maxTokens = 120000;
+            this.responseTokens = 4000;
+        }
+        else if (model.includes('gemini-2.5-pro')) {
+            this.maxTokens = 600000;
+            this.responseTokens = 50000;
+        }
         else {
             this.maxTokens = 4000;
             this.responseTokens = 1000;

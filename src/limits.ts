@@ -24,17 +24,24 @@ export class TokenLimits {
       this.responseTokens = 4000
     } else if (model.includes('o1-mini')) {
       this.maxTokens = 80000
-      this.responseTokens = 65000
+      this.responseTokens = 50000
     } else if (model.includes('o3-mini')) {
-      // o3-mini can take 200k tokens, but we need to keep some buffer for reasoning tokens and context
       this.maxTokens = 120000
-      this.responseTokens = 90000
+      this.responseTokens = 50000
     } else if (model.includes('claude-3-7-sonnet')) {
       this.maxTokens = 120000
       this.responseTokens = 4000
     } else if (model.includes('gemini-2.5-pro')) {
       this.maxTokens = 600000
       this.responseTokens = 50000
+      this.knowledgeCutOff = '2025-01-01'
+    } else if (model.includes('gemini-2.0')) {
+      this.maxTokens = 800000
+      this.responseTokens = 8000
+      this.knowledgeCutOff = '2024-10-01'
+    } else if (model.includes('gemini-1.5-pro')) {
+      this.maxTokens = 1000000
+      this.responseTokens = 8000
     } else {
       this.maxTokens = 4000
       this.responseTokens = 1000
